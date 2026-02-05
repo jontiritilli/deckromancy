@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { fetchDeckById, extractDeckId } from '../lib/deck-fetcher';
 import { analyzeDeck } from '../lib/deck-analyzer';
 
@@ -10,6 +10,7 @@ export function useDeck() {
   const [deck, setDeck] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [initialDeckId, setInitialDeckId] = useState(null);
 
   const importDeck = useCallback(async (urlOrId) => {
     setLoading(true);
@@ -39,6 +40,11 @@ export function useDeck() {
       );
 
       setDeck(analyzedDeck);
+
+      // Update URL with deck param
+      const url = new URL(window.location);
+      url.searchParams.set('deck', deckId);
+      history.replaceState(null, '', url);
     } catch (err) {
       setError(err.message || 'Failed to import deck');
       setDeck(null);
@@ -50,7 +56,19 @@ export function useDeck() {
   const clearDeck = useCallback(() => {
     setDeck(null);
     setError(null);
+    // Strip deck param from URL
+    history.replaceState(null, '', window.location.pathname);
   }, []);
+
+  // Auto-load deck from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const deckParam = params.get('deck');
+    if (deckParam) {
+      setInitialDeckId(deckParam);
+      importDeck(deckParam);
+    }
+  }, [importDeck]);
 
   return {
     deck,
@@ -58,5 +76,6 @@ export function useDeck() {
     error,
     importDeck,
     clearDeck,
+    initialDeckId,
   };
 }

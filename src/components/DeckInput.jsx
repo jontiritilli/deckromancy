@@ -1,7 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function DeckInput({ onImport, onClear, loading, hasDeck }) {
+export default function DeckInput({ onImport, onClear, loading, hasDeck, initialUrl }) {
   const [url, setUrl] = useState('');
+
+  // Pre-fill input if deck was auto-loaded from URL
+  useEffect(() => {
+    if (initialUrl) {
+      setUrl(initialUrl);
+    }
+  }, [initialUrl]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
