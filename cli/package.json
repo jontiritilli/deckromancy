@@ -1,0 +1,14 @@
+{
+  "name": "sorcery-collection-manager",
+  "version": "1.0.0",
+  "description": "Utility for managing Sorcery TCG card collections and decks",
+  "type": "module",
+  "main": "cli.js",
+  "bin": {
+    "sorcery": "./cli.js"
+  },
+  "scripts": {
+    "filter": "node filter.js",
+    "fetch-deck": "node cli.js fetch-deck"
+  }
+}
