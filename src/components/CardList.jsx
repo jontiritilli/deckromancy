@@ -239,16 +239,16 @@ export default function CardList({ cards }) {
               <tr
                 key={`${card.name}-${idx}`}
                 className="border-b border-gray-700/50 hover:bg-gray-700/30"
-                onMouseEnter={(e) => handleMouseEnter(e, card)}
-                onMouseLeave={handleMouseLeave}
               >
                 <td className="py-2 pr-4">
                   {card.imageUrl ? (
                     <img
                       src={card.imageUrl}
                       alt={card.name}
-                      className="w-12 h-16 object-cover rounded"
+                      className="w-12 h-16 object-cover rounded cursor-zoom-in"
                       loading="lazy"
+                      onMouseEnter={(e) => handleMouseEnter(e, card)}
+                      onMouseLeave={handleMouseLeave}
                     />
                   ) : (
                     <div className="w-12 h-16 bg-gray-700 rounded flex items-center justify-center text-xs text-gray-500">
