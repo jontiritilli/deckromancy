@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Analytics } from '@vercel/analytics/next';
 import { useDeck } from './hooks/useDeck';
 import { useFavorites } from './hooks/useFavorites';
 import DeckInput from './components/DeckInput';
@@ -13,7 +14,8 @@ import SynergyTags from './components/SynergyTags';
 import CardList from './components/CardList';
 
 function App() {
-  const { deck, loading, error, importDeck, clearDeck, initialDeckId } = useDeck();
+  const { deck, loading, error, importDeck, clearDeck, initialDeckId } =
+    useDeck();
   const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   const downloadDeckJson = useCallback(() => {
@@ -113,6 +115,7 @@ function App() {
           </div>
         )}
       </div>
+      <Analytics />
     </div>
   );
 }
