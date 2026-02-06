@@ -3,5 +3,29 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-900 text-gray-100;
+  @apply bg-shadow-grey-950 text-shadow-grey-100;
+}
+
+@layer components {
+  .section-panel {
+    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50;
+  }
+  .section-panel-cyan {
+    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-pacific-cyan-500;
+  }
+  .section-panel-mint {
+    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-mint-cream-400;
+  }
+  .section-panel-sandy {
+    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-sandy-brown-400;
+  }
+  .section-panel-rosy {
+    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-rosy-granite-400;
+  }
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-widest mb-3;
+  }
+  .divider-gradient {
+    @apply h-px bg-gradient-to-r from-transparent via-rosy-granite-500/40 to-transparent my-8;
+  }
 }

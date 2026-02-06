@@ -2,24 +2,25 @@ import { useState, useRef, useCallback } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie, Doughnut, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
+import { CHART_THEME } from '../lib/chart-theme';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const TYPE_COLORS = {
-  Minion: '#8b5cf6',
-  Magic: '#06b6d4',
-  Site: '#f59e0b',
-  Aura: '#ec4899',
-  Artifact: '#6b7280',
-  Unknown: '#374151',
+  Minion: '#208aae',
+  Magic: '#79b791',
+  Site: '#dd7230',
+  Aura: '#ffd131',
+  Artifact: '#0d324d',
+  Unknown: '#262d40',
 };
 
 const ELEMENT_COLORS = {
-  fire: '#ef4444',
-  water: '#3b82f6',
-  earth: '#22c55e',
-  air: '#eab308',
-  none: '#6b7280',
+  fire: '#dd7230',
+  water: '#208aae',
+  earth: '#79b791',
+  air: '#ffd131',
+  none: '#5e70a1',
 };
 
 const ELEMENT_LABELS = {
@@ -60,7 +61,7 @@ export default function TypeChart() {
 
     const labels = activeElements.map(([el]) => ELEMENT_LABELS[el] || el);
     const dataValues = activeElements.map(([, count]) => count);
-    const colors = activeElements.map(([el]) => ELEMENT_COLORS[el] || '#6b7280');
+    const colors = activeElements.map(([el]) => ELEMENT_COLORS[el] || '#5e70a1');
 
     const data = {
       labels,
@@ -68,7 +69,7 @@ export default function TypeChart() {
         {
           data: dataValues,
           backgroundColor: colors,
-          borderColor: '#1f2937',
+          borderColor: CHART_THEME.borderColor,
           borderWidth: 2,
         },
       ],
@@ -81,7 +82,7 @@ export default function TypeChart() {
         legend: {
           position: 'right',
           labels: {
-            color: '#e5e7eb',
+            color: CHART_THEME.titleColor,
             padding: 12,
             usePointStyle: true,
           },
@@ -89,7 +90,7 @@ export default function TypeChart() {
         title: {
           display: true,
           text: `${drilldownType} Elements`,
-          color: '#e5e7eb',
+          color: CHART_THEME.titleColor,
           font: {
             size: 16,
             weight: 'bold',
@@ -99,10 +100,10 @@ export default function TypeChart() {
     };
 
     return (
-      <div className="bg-gray-800 rounded-lg p-4 h-64 relative">
+      <div className="section-panel-sandy p-5 h-72 relative">
         <button
           onClick={() => setDrilldownType(null)}
-          className="absolute top-2 right-2 z-10 px-2 py-1 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded text-xs text-gray-300 transition-colors"
+          className="absolute top-2 right-2 z-10 px-2 py-1 bg-shadow-grey-700 hover:bg-shadow-grey-600 border border-shadow-grey-600 rounded text-xs text-shadow-grey-300 transition-colors"
         >
           Back to Types
         </button>
@@ -126,7 +127,7 @@ export default function TypeChart() {
       {
         data: dataValues,
         backgroundColor: colors,
-        borderColor: '#1f2937',
+        borderColor: CHART_THEME.borderColor,
         borderWidth: 2,
       },
     ],
@@ -139,7 +140,7 @@ export default function TypeChart() {
       legend: {
         position: 'right',
         labels: {
-          color: '#e5e7eb',
+          color: CHART_THEME.titleColor,
           padding: 12,
           usePointStyle: true,
         },
@@ -147,7 +148,7 @@ export default function TypeChart() {
       title: {
         display: true,
         text: 'Card Types',
-        color: '#e5e7eb',
+        color: CHART_THEME.titleColor,
         font: {
           size: 16,
           weight: 'bold',
@@ -160,11 +161,11 @@ export default function TypeChart() {
   const canDrilldown = activeType && typeElementBreakdown?.[activeType];
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-64 relative [&_canvas]:!cursor-pointer">
+    <div className="section-panel-sandy p-5 h-72 relative [&_canvas]:!cursor-pointer">
       {canDrilldown && (
         <button
           onClick={() => setDrilldownType(activeType)}
-          className="absolute top-2 right-2 z-10 px-2 py-1 bg-purple-700 hover:bg-purple-600 border border-purple-500 rounded text-xs text-purple-100 transition-colors"
+          className="absolute top-2 right-2 z-10 px-2 py-1 bg-mint-cream-700 hover:bg-mint-cream-600 border border-mint-cream-500 rounded text-xs text-mint-cream-100 transition-colors"
         >
           View Elements &rarr;
         </button>

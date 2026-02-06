@@ -29,13 +29,13 @@ export default function DeckInput({ onImport, onClear, loading, hasDeck, initial
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="Enter curiosa.io deck URL..."
-        className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className="flex-1 px-4 py-2 bg-shadow-grey-900 border border-shadow-grey-600 rounded-lg text-shadow-grey-100 placeholder-shadow-grey-500 focus:outline-none focus:ring-2 focus:ring-sandy-brown-400 focus:border-transparent"
         disabled={loading}
       />
       <button
         type="submit"
         disabled={loading || !url.trim()}
-        className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+        className="px-6 py-2 bg-pacific-cyan-500 hover:bg-pacific-cyan-600 disabled:bg-shadow-grey-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
       >
         {loading ? (
           <span className="flex items-center gap-2">
@@ -65,7 +65,7 @@ export default function DeckInput({ onImport, onClear, loading, hasDeck, initial
         <button
           type="button"
           onClick={handleClear}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium rounded-lg transition-colors"
+          className="px-4 py-2 bg-shadow-grey-800 hover:bg-shadow-grey-700 text-shadow-grey-300 font-medium rounded-lg transition-colors"
         >
           Clear
         </button>

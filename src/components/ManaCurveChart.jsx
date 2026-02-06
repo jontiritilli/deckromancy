@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
+import { CHART_THEME } from '../lib/chart-theme';
 
 ChartJS.register(
   CategoryScale,
@@ -30,7 +31,7 @@ const options = {
     title: {
       display: true,
       text: 'Mana Curve',
-      color: '#e5e7eb',
+      color: CHART_THEME.titleColor,
       font: {
         size: 16,
         weight: 'bold',
@@ -41,16 +42,16 @@ const options = {
     y: {
       beginAtZero: true,
       ticks: {
-        color: '#9ca3af',
+        color: CHART_THEME.tickColor,
         stepSize: 2,
       },
       grid: {
-        color: '#374151',
+        color: CHART_THEME.gridColor,
       },
     },
     x: {
       ticks: {
-        color: '#9ca3af',
+        color: CHART_THEME.tickColor,
       },
       grid: {
         display: false,
@@ -59,8 +60,8 @@ const options = {
   },
 };
 
-const BASE_COLOR = '#8b5cf6';
-const DIM_COLOR = '#8b5cf633';
+const BASE_COLOR = '#208aae';
+const DIM_COLOR = '#208aae33';
 
 export default function ManaCurveChart() {
   const chartRef = useRef(null);
@@ -82,7 +83,7 @@ export default function ManaCurveChart() {
         label: 'Cards',
         data: dataValues,
         backgroundColor: bgColors,
-        borderColor: '#7c3aed',
+        borderColor: '#186e8b',
         borderWidth: 1,
         borderRadius: 4,
       },
@@ -101,7 +102,7 @@ export default function ManaCurveChart() {
   );
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-64 [&_canvas]:!cursor-pointer">
+    <div className="section-panel-cyan p-5 h-80 [&_canvas]:!cursor-pointer">
       <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );

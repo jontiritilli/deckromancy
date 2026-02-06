@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
+import { CHART_THEME } from '../lib/chart-theme';
 
 ChartJS.register(
   CategoryScale,
@@ -21,10 +22,10 @@ ChartJS.register(
 );
 
 const RARITY_COLORS = {
-  Ordinary: '#9ca3af',
-  Exceptional: '#22c55e',
-  Elite: '#3b82f6',
-  Unique: '#f59e0b',
+  Ordinary: '#7e8db4',
+  Exceptional: '#79b791',
+  Elite: '#208aae',
+  Unique: '#ffd131',
 };
 
 const RARITY_ORDER = ['Ordinary', 'Exceptional', 'Elite', 'Unique'];
@@ -40,7 +41,7 @@ const options = {
     title: {
       display: true,
       text: 'Rarity Distribution',
-      color: '#e5e7eb',
+      color: CHART_THEME.titleColor,
       font: {
         size: 16,
         weight: 'bold',
@@ -51,15 +52,15 @@ const options = {
     x: {
       beginAtZero: true,
       ticks: {
-        color: '#9ca3af',
+        color: CHART_THEME.tickColor,
       },
       grid: {
-        color: '#374151',
+        color: CHART_THEME.gridColor,
       },
     },
     y: {
       ticks: {
-        color: '#9ca3af',
+        color: CHART_THEME.tickColor,
       },
       grid: {
         display: false,
@@ -78,7 +79,7 @@ export default function RarityChart() {
   const labels = RARITY_ORDER.filter((r) => rarityBreakdown[r] > 0);
   const dataValues = labels.map((r) => rarityBreakdown[r]);
   const colors = labels.map((r) => {
-    const base = RARITY_COLORS[r] || '#6b7280';
+    const base = RARITY_COLORS[r] || '#5e70a1';
     if (activeRarity === null) return base;
     return r === activeRarity ? base : base + '33';
   });
@@ -109,7 +110,7 @@ export default function RarityChart() {
   );
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-64 [&_canvas]:!cursor-pointer">
+    <div className="section-panel-rosy p-5 h-72 [&_canvas]:!cursor-pointer">
       <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );

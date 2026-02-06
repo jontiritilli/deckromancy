@@ -11,6 +11,7 @@ import {
 import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
 import { KEYWORD_CATEGORIES } from '../lib/deck-analyzer';
+import { CHART_THEME } from '../lib/chart-theme';
 
 ChartJS.register(
   CategoryScale,
@@ -22,10 +23,17 @@ ChartJS.register(
 );
 
 const CATEGORY_COLORS = {
-  Abilities: '#10b981',
-  Triggers: '#f59e0b',
-  Mechanics: '#0ea5e9',
-  Positioning: '#9ca3af',
+  Abilities: '#79b791',
+  Triggers: '#ffd131',
+  Mechanics: '#208aae',
+  Positioning: '#ad8593',
+};
+
+const CATEGORY_ACCENTS = {
+  Abilities: 'border-t-4 border-t-mint-cream-400',
+  Triggers: 'border-t-4 border-t-yellow-400',
+  Mechanics: 'border-t-4 border-t-pacific-cyan-500',
+  Positioning: 'border-t-4 border-t-rosy-granite-400',
 };
 
 // Build a reverse lookup: keyword → category
@@ -46,18 +54,18 @@ function buildChartOptions(title) {
       title: {
         display: true,
         text: title,
-        color: '#e5e7eb',
+        color: CHART_THEME.titleColor,
         font: { size: 14, weight: 'bold' },
       },
     },
     scales: {
       x: {
         beginAtZero: true,
-        ticks: { color: '#9ca3af', stepSize: 1 },
-        grid: { color: '#374151' },
+        ticks: { color: CHART_THEME.tickColor, stepSize: 1 },
+        grid: { color: CHART_THEME.gridColor },
       },
       y: {
-        ticks: { color: '#9ca3af' },
+        ticks: { color: CHART_THEME.tickColor },
         grid: { display: false },
       },
     },
@@ -66,7 +74,8 @@ function buildChartOptions(title) {
 
 function CategoryChart({ category, keywords, activeKeyword, toggleFilter }) {
   const chartRef = useRef(null);
-  const color = CATEGORY_COLORS[category] || '#6b7280';
+  const color = CATEGORY_COLORS[category] || '#5e70a1';
+  const accent = CATEGORY_ACCENTS[category] || '';
 
   const labels = keywords.map(([kw]) => kw);
   const dataValues = keywords.map(([, count]) => count);
@@ -104,7 +113,7 @@ function CategoryChart({ category, keywords, activeKeyword, toggleFilter }) {
   const height = Math.max(120, keywords.length * 28 + 50);
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 [&_canvas]:!cursor-pointer" style={{ height }}>
+    <div className={`section-panel p-4 [&_canvas]:!cursor-pointer ${accent}`} style={{ height }}>
       <Bar ref={chartRef} options={buildChartOptions(category)} data={data} onClick={handleClick} />
     </div>
   );
@@ -142,28 +151,31 @@ export default function SynergyTags() {
     <div className="space-y-4">
       {/* Keyword category charts */}
       {activeCategories.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {activeCategories.map((category) => (
-            <CategoryChart
-              key={category}
-              category={category}
-              keywords={grouped[category]}
-              activeKeyword={activeKeyword}
-              toggleFilter={toggleFilter}
-            />
-          ))}
-        </div>
+        <>
+          <div className="section-label text-shadow-grey-400">Keyword Synergies</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {activeCategories.map((category) => (
+              <CategoryChart
+                key={category}
+                category={category}
+                keywords={grouped[category]}
+                activeKeyword={activeKeyword}
+                toggleFilter={toggleFilter}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Themes */}
       {themes.length > 0 && (
-        <div className="bg-gray-800 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-gray-400 mb-2">Themes</h3>
+        <div className="section-panel p-4">
+          <div className="section-label text-rosy-granite-400">Detected Themes</div>
           <div className="flex flex-wrap gap-2">
             {themes.map((theme) => (
               <span
                 key={theme}
-                className="px-3 py-1 bg-purple-900/50 border border-purple-600 rounded-full text-sm text-purple-300"
+                className="px-3 py-1 bg-rosy-granite-900/50 border border-rosy-granite-500/50 rounded-full text-sm text-rosy-granite-200"
               >
                 {theme}
               </span>

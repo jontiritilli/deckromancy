@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
+import { CHART_THEME } from '../lib/chart-theme';
 
 ChartJS.register(
   CategoryScale,
@@ -21,10 +22,10 @@ ChartJS.register(
 );
 
 const ELEMENT_COLORS = {
-  fire: '#ef4444',
-  water: '#3b82f6',
-  earth: '#22c55e',
-  air: '#eab308',
+  fire: '#dd7230',
+  water: '#208aae',
+  earth: '#79b791',
+  air: '#ffd131',
 };
 
 const ELEMENT_LABELS = {
@@ -40,13 +41,13 @@ const options = {
   plugins: {
     legend: {
       labels: {
-        color: '#e5e7eb',
+        color: CHART_THEME.titleColor,
       },
     },
     title: {
       display: true,
       text: 'Site Distribution vs Thresholds',
-      color: '#e5e7eb',
+      color: CHART_THEME.titleColor,
       font: {
         size: 16,
         weight: 'bold',
@@ -57,16 +58,16 @@ const options = {
     y: {
       beginAtZero: true,
       ticks: {
-        color: '#9ca3af',
+        color: CHART_THEME.tickColor,
         stepSize: 1,
       },
       grid: {
-        color: '#374151',
+        color: CHART_THEME.gridColor,
       },
     },
     x: {
       ticks: {
-        color: '#9ca3af',
+        color: CHART_THEME.tickColor,
       },
       grid: {
         display: false,
@@ -137,7 +138,7 @@ export default function SiteDistributionChart() {
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-64 [&_canvas]:!cursor-pointer">
+    <div className="section-panel-mint p-5 h-72 [&_canvas]:!cursor-pointer">
       <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );

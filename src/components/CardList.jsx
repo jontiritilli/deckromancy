@@ -2,25 +2,25 @@ import { useState, useMemo, useCallback } from 'react';
 import { useDeckFilter } from '../context/DeckFilterContext';
 
 const ELEMENT_COLORS = {
-  Fire: 'text-red-400',
-  Water: 'text-blue-400',
-  Earth: 'text-green-400',
-  Air: 'text-yellow-400',
+  Fire: 'text-[#dd7230]',
+  Water: 'text-[#208aae]',
+  Earth: 'text-[#79b791]',
+  Air: 'text-[#ffd131]',
 };
 
 const TYPE_COLORS = {
-  Minion: 'bg-purple-900/30 text-purple-300',
-  Magic: 'bg-cyan-900/30 text-cyan-300',
-  Site: 'bg-amber-900/30 text-amber-300',
-  Aura: 'bg-pink-900/30 text-pink-300',
-  Artifact: 'bg-gray-700 text-gray-300',
+  Minion: 'bg-[#208aae]/20 text-[#208aae]',
+  Magic: 'bg-[#79b791]/20 text-[#79b791]',
+  Site: 'bg-[#dd7230]/20 text-[#dd7230]',
+  Aura: 'bg-[#ffd131]/20 text-[#ffd131]',
+  Artifact: 'bg-shadow-grey-700 text-shadow-grey-300',
 };
 
 const RARITY_COLORS = {
-  Ordinary: 'bg-gray-600/30 text-gray-300',
-  Exceptional: 'bg-blue-900/30 text-blue-300',
-  Elite: 'bg-purple-900/30 text-purple-300',
-  Unique: 'bg-amber-900/30 text-amber-300',
+  Ordinary: 'bg-shadow-grey-600/30 text-shadow-grey-300',
+  Exceptional: 'bg-[#79b791]/20 text-[#79b791]',
+  Elite: 'bg-[#208aae]/20 text-[#208aae]',
+  Unique: 'bg-[#ffd131]/20 text-[#ffd131]',
 };
 
 const RARITY_ORDER = ['Ordinary', 'Exceptional', 'Elite', 'Unique'];
@@ -179,111 +179,113 @@ export default function CardList({ cards, title = 'Cards' }) {
     : null;
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4">
-      <div className="flex flex-wrap justify-between items-center gap-3">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center gap-2 text-lg font-bold text-gray-100 hover:text-gray-300 transition-colors"
-        >
-          <span
-            className={`text-sm transition-transform ${
-              collapsed ? '' : 'rotate-90'
-            }`}
+    <div className="section-panel overflow-hidden border-t-4 border-t-rosy-granite-500/60 p-0">
+      <div className="px-5 py-4 bg-shadow-grey-900/40">
+        <div className="flex flex-wrap justify-between items-center gap-3">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex items-center gap-2 text-lg font-bold text-shadow-grey-100 hover:text-shadow-grey-300 transition-colors"
           >
-            &#9654;
-          </span>
-          {title} ({filteredCards.reduce((sum, c) => sum + c.quantity, 0)}{' '}
-          cards, {filteredCards.length} unique)
-        </button>
-
-        {/* Filters + Copy */}
-        {!collapsed && (
-          <div className="flex flex-wrap gap-3 items-center">
-            <select
-              value={filter.type}
-              onChange={(e) => setFilter({ ...filter, type: e.target.value })}
-              className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-gray-200"
+            <span
+              className={`text-sm transition-transform ${
+                collapsed ? '' : 'rotate-90'
+              }`}
             >
-              <option value="">All Types</option>
-              {types.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
+              &#9654;
+            </span>
+            {title} ({filteredCards.reduce((sum, c) => sum + c.quantity, 0)}{' '}
+            cards, {filteredCards.length} unique)
+          </button>
 
-            <select
-              value={filter.element}
-              onChange={(e) =>
-                setFilter({ ...filter, element: e.target.value })
-              }
-              className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-gray-200"
-            >
-              <option value="">All Elements</option>
-              {elements.map((e) => (
-                <option key={e} value={e}>
-                  {e}
-                </option>
-              ))}
-            </select>
+          {/* Filters + Copy */}
+          {!collapsed && (
+            <div className="flex flex-wrap gap-3 items-center">
+              <select
+                value={filter.type}
+                onChange={(e) => setFilter({ ...filter, type: e.target.value })}
+                className="px-3 py-1 bg-shadow-grey-700 border border-shadow-grey-600 border-l-2 border-l-sandy-brown-500/50 rounded text-sm text-shadow-grey-200"
+              >
+                <option value="">All Types</option>
+                {types.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
 
-            <select
-              value={filter.rarity}
-              onChange={(e) => setFilter({ ...filter, rarity: e.target.value })}
-              className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-gray-200"
-            >
-              <option value="">All Rarities</option>
-              {rarities.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+              <select
+                value={filter.element}
+                onChange={(e) =>
+                  setFilter({ ...filter, element: e.target.value })
+                }
+                className="px-3 py-1 bg-shadow-grey-700 border border-shadow-grey-600 border-l-2 border-l-mint-cream-400/50 rounded text-sm text-shadow-grey-200"
+              >
+                <option value="">All Elements</option>
+                {elements.map((e) => (
+                  <option key={e} value={e}>
+                    {e}
+                  </option>
+                ))}
+              </select>
 
-            <button
-              onClick={copyTcgList}
-              className="px-3 py-1 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded text-sm text-gray-200 transition-colors"
-            >
-              {copied ? 'Copied!' : 'Copy List'}
-            </button>
-          </div>
-        )}
+              <select
+                value={filter.rarity}
+                onChange={(e) => setFilter({ ...filter, rarity: e.target.value })}
+                className="px-3 py-1 bg-shadow-grey-700 border border-shadow-grey-600 border-l-2 border-l-rosy-granite-400/50 rounded text-sm text-shadow-grey-200"
+              >
+                <option value="">All Rarities</option>
+                {rarities.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={copyTcgList}
+                className="px-3 py-1 bg-pacific-cyan-800/50 hover:bg-pacific-cyan-700/50 border border-pacific-cyan-600/50 rounded text-sm text-pacific-cyan-200 transition-colors"
+              >
+                {copied ? 'Copied!' : 'Copy List'}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Card Grid */}
       {!collapsed && (
-        <div className="overflow-x-auto mt-4">
+        <div className="overflow-x-auto px-5 pb-4">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-400 border-b border-gray-700">
+              <tr className="text-left text-shadow-grey-300 border-b-2 border-shadow-grey-600">
                 <th className="pb-2 pr-4">Image</th>
                 <th
-                  className="pb-2 pr-4 cursor-pointer hover:text-gray-200"
+                  className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
                   onClick={() => handleSort('name')}
                 >
                   Name <SortIcon column="name" />
                 </th>
                 <th
-                  className="pb-2 pr-4 cursor-pointer hover:text-gray-200"
+                  className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
                   onClick={() => handleSort('type')}
                 >
                   Type <SortIcon column="type" />
                 </th>
                 <th
-                  className="pb-2 pr-4 cursor-pointer hover:text-gray-200"
+                  className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
                   onClick={() => handleSort('cost')}
                 >
                   Cost <SortIcon column="cost" />
                 </th>
                 <th
-                  className="pb-2 pr-4 cursor-pointer hover:text-gray-200"
+                  className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
                   onClick={() => handleSort('rarity')}
                 >
                   Rarity <SortIcon column="rarity" />
                 </th>
                 <th className="pb-2 pr-4">Elements</th>
                 <th
-                  className="pb-2 cursor-pointer hover:text-gray-200"
+                  className="pb-2 cursor-pointer hover:text-shadow-grey-200"
                   onClick={() => handleSort('quantity')}
                 >
                   Qty <SortIcon column="quantity" />
@@ -294,7 +296,7 @@ export default function CardList({ cards, title = 'Cards' }) {
               {filteredCards.map((card, idx) => (
                 <tr
                   key={`${card.name}-${idx}`}
-                  className="border-b border-gray-700/50 hover:bg-gray-700/30"
+                  className="border-b border-shadow-grey-700/50 hover:bg-rosy-granite-900/20 even:bg-shadow-grey-900/30"
                 >
                   <td className="py-2 pr-4">
                     {card.imageUrl ? (
@@ -307,31 +309,31 @@ export default function CardList({ cards, title = 'Cards' }) {
                         onMouseLeave={handleMouseLeave}
                       />
                     ) : (
-                      <div className="w-12 h-16 bg-gray-700 rounded flex items-center justify-center text-xs text-gray-500">
+                      <div className="w-12 h-16 bg-shadow-grey-700 rounded flex items-center justify-center text-xs text-shadow-grey-500">
                         ?
                       </div>
                     )}
                   </td>
-                  <td className="py-2 pr-4 font-medium text-gray-200">
+                  <td className="py-2 pr-4 font-medium text-shadow-grey-200">
                     {card.name}
                   </td>
                   <td className="py-2 pr-4">
                     <span
                       className={`px-2 py-0.5 rounded text-xs ${
-                        TYPE_COLORS[card.type] || 'bg-gray-700 text-gray-300'
+                        TYPE_COLORS[card.type] || 'bg-shadow-grey-700 text-shadow-grey-300'
                       }`}
                     >
                       {card.type}
                     </span>
                   </td>
-                  <td className="py-2 pr-4 text-gray-300">
+                  <td className="py-2 pr-4 text-shadow-grey-300">
                     {card.cost !== null ? card.cost : '-'}
                   </td>
                   <td className="py-2 pr-4">
                     <span
                       className={`px-2 py-0.5 rounded text-xs ${
                         RARITY_COLORS[card.rarity] ||
-                        'bg-gray-700 text-gray-300'
+                        'bg-shadow-grey-700 text-shadow-grey-300'
                       }`}
                     >
                       {card.rarity || '-'}
@@ -343,18 +345,18 @@ export default function CardList({ cards, title = 'Cards' }) {
                         <span
                           key={el}
                           className={`text-xs ${
-                            ELEMENT_COLORS[el] || 'text-gray-400'
+                            ELEMENT_COLORS[el] || 'text-shadow-grey-400'
                           }`}
                         >
                           {el}
                         </span>
                       ))}
                       {card.elements.length === 0 && (
-                        <span className="text-xs text-gray-500">-</span>
+                        <span className="text-xs text-shadow-grey-500">-</span>
                       )}
                     </div>
                   </td>
-                  <td className="py-2 text-gray-300 font-medium">
+                  <td className="py-2 text-shadow-grey-300 font-medium">
                     x{card.quantity}
                   </td>
                 </tr>
@@ -370,7 +372,7 @@ export default function CardList({ cards, title = 'Cards' }) {
           <img
             src={hover.imageUrl}
             alt="Card preview"
-            className="w-full h-full object-cover rounded-lg shadow-2xl border border-gray-600"
+            className="w-full h-full object-cover rounded-lg shadow-2xl border border-pacific-cyan-600/30 shadow-pacific-cyan-900/30"
           />
         </div>
       )}
