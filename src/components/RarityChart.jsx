@@ -68,9 +68,10 @@ const options = {
   },
 };
 
-export default function RarityChart({ rarityBreakdown }) {
+export default function RarityChart() {
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter } = useDeckFilter();
+  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
+  const { rarityBreakdown } = filteredStats;
   const activeRarity = pageFilter.rarity;
 
   // Sort rarities in a consistent order

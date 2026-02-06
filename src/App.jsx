@@ -1,9 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { useDeck } from './hooks/useDeck';
 import { useFavorites } from './hooks/useFavorites';
 import { DeckFilterProvider, useDeckFilter } from './context/DeckFilterContext';
-import { computeStatsFromFormattedCards } from './lib/deck-analyzer';
 import DeckInput from './components/DeckInput';
 import DeckHeader from './components/DeckHeader';
 import Favorites from './components/Favorites';
@@ -20,6 +19,7 @@ const FILTER_LABELS = {
   type: 'Type',
   rarity: 'Rarity',
   element: 'Element',
+  keyword: 'Keyword',
 };
 
 function ActiveFilterChips() {
@@ -51,46 +51,15 @@ function ActiveFilterChips() {
   );
 }
 
-function applyPageFilter(cards, pageFilter) {
-  let result = cards;
-
-  if (pageFilter.cost !== null) {
-    result = result.filter((c) => {
-      if (c.cost === null) return false;
-      if (pageFilter.cost === '7+') return c.cost >= 7;
-      return c.cost === Number(pageFilter.cost);
-    });
-  }
-
-  if (pageFilter.type) {
-    result = result.filter((c) => c.type === pageFilter.type);
-  }
-
-  if (pageFilter.rarity) {
-    result = result.filter((c) => c.rarity === pageFilter.rarity);
-  }
-
-  if (pageFilter.element) {
-    result = result.filter((c) => c.elements.includes(pageFilter.element));
-  }
-
-  return result;
-}
-
-function DeckContent({ deck, downloadDeckJson, isFavorite, addFavorite, removeFavorite }) {
-  const { pageFilter } = useDeckFilter();
-
-  const filteredStats = useMemo(() => {
-    const filtered = applyPageFilter(deck.cards, pageFilter);
-    return computeStatsFromFormattedCards(filtered);
-  }, [deck.cards, pageFilter]);
+function DeckContent({ downloadDeckJson, isFavorite, addFavorite, removeFavorite }) {
+  const { deck } = useDeckFilter();
 
   return (
     <div className="mt-8 space-y-8">
       {/* Deck Header + Actions */}
       <div className="flex flex-wrap items-start gap-4">
         <div className="flex-1">
-          <DeckHeader deckName={deck.deckName} avatar={deck.avatar} stats={filteredStats} collectionCount={deck.sideboard.reduce((sum, c) => sum + c.quantity, 0)} />
+          <DeckHeader />
         </div>
         <div className="flex gap-2 pt-1">
           <button
@@ -117,27 +86,21 @@ function DeckContent({ deck, downloadDeckJson, isFavorite, addFavorite, removeFa
       </div>
 
       {/* Stats Overview */}
-      <StatsOverview stats={filteredStats} />
+      <StatsOverview />
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ManaCurveChart manaCurve={filteredStats.manaCurve} />
-        <TypeChart
-          typeBreakdown={filteredStats.typeBreakdown}
-          typeElementBreakdown={filteredStats.typeElementBreakdown}
-        />
-        <RarityChart rarityBreakdown={filteredStats.rarityBreakdown} />
-        <SiteDistributionChart
-          siteElementBreakdown={filteredStats.siteElementBreakdown}
-          maxThresholds={filteredStats.maxThresholds}
-        />
+        <ManaCurveChart />
+        <TypeChart />
+        <RarityChart />
+        <SiteDistributionChart />
       </div>
 
       {/* Active Filter Chips */}
       <ActiveFilterChips />
 
       {/* Synergies */}
-      <SynergyTags synergies={deck.synergies} />
+      <SynergyTags />
 
       {/* Card List */}
       <CardList cards={deck.cards} />
@@ -203,9 +166,8 @@ function App() {
 
         {/* Deck Content */}
         {deck && (
-          <DeckFilterProvider resetKey={deck.deckId}>
+          <DeckFilterProvider deck={deck}>
             <DeckContent
-              deck={deck}
               downloadDeckJson={downloadDeckJson}
               isFavorite={isFavorite}
               addFavorite={addFavorite}

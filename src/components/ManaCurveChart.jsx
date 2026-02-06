@@ -62,9 +62,10 @@ const options = {
 const BASE_COLOR = '#8b5cf6';
 const DIM_COLOR = '#8b5cf633';
 
-export default function ManaCurveChart({ manaCurve }) {
+export default function ManaCurveChart() {
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter } = useDeckFilter();
+  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
+  const { manaCurve } = filteredStats;
   const activeCost = pageFilter.cost;
 
   const labels = ['0', '1', '2', '3', '4', '5', '6', '7+'];

@@ -2,39 +2,64 @@
  * Analyzes deck data and extracts statistics and synergies
  */
 
+export const KEYWORD_CATEGORIES = {
+  Abilities: [
+    'Airborne', 'Burrow', 'Submerge', 'Lethal', 'Ranged',
+    'Stealth', 'Charge', 'Guardian', 'Immobile', 'Projectile',
+    'Spellcaster', 'Disable',
+  ],
+  Triggers: ['Genesis', 'Arrival', 'Death'],
+  Mechanics: [
+    'Ward', 'Banish', 'Silence', 'Token', 'Summon',
+    'Draw', 'Damage', 'Life Gain', 'Life Loss',
+  ],
+  Positioning: ['Nearby', 'Adjacent', 'Front'],
+};
+
 const KEYWORD_PATTERNS = {
+  // Static abilities
+  Airborne: /\bAirborne\b/i,
+  Burrow: /\bBurrow\b/i,
+  Submerge: /\bSubmerge\b/i,
+  Lethal: /\bLethal\b/i,
+  Ranged: /\bRanged\b/i,
+  Stealth: /\bStealth\b/i,
+  Charge: /\bCharge\b/i,
+  Guardian: /\bGuardian\b/i,
+  Immobile: /\bImmobile\b/i,
+  Projectile: /\bProjectile\b/i,
+  Spellcaster: /\bSpellcaster\b/i,
+  Disable: /\bDisable\b/i,
+
   // Triggers
   Genesis: /\bGenesis\b/i,
   Arrival: /\bArrival\b/i,
   Death: /\bDeath\b/i,
-  Tap: /\bTap\b/i,
 
   // Mechanics
-  token: /\btoken\b/i,
-  summon: /\bsummon\b/i,
-  banish: /\bbanish\b/i,
-  silence: /\bsilence\b/i,
   Ward: /\bWard\b/i,
-
-  // Resources
-  draw: /\bdraw\b/i,
-  'life-gain': /\bgain.*life\b/i,
-  'life-loss': /\blose.*life|lost life\b/i,
-  damage: /\bdamage\b/i,
+  Banish: /\bbanish\b/i,
+  Silence: /\bsilence\b/i,
+  Token: /\btoken\b/i,
+  Summon: /\bsummon\b/i,
+  Draw: /\bdraw\b/i,
+  Damage: /\bdamage\b/i,
+  'Life Gain': /\bgain.*life\b/i,
+  'Life Loss': /\blose.*life|lost life\b/i,
 
   // Positioning
-  nearby: /\bnearby\b/i,
-  adjacent: /\badjacent\b/i,
-  front: /\bfront\b/i,
+  Nearby: /\bnearby\b/i,
+  Adjacent: /\badjacent\b/i,
+  Front: /\bfront\b/i,
 };
 
 // Theme detection based on keyword combinations
 const THEME_RULES = {
-  tokens: ['token', 'summon'],
-  sacrifice: ['Death', 'life-loss'],
-  control: ['silence', 'banish'],
-  aggro: ['damage', 'Arrival'],
-  ramp: ['draw', 'Genesis'],
+  tokens: ['Token', 'Summon'],
+  sacrifice: ['Death', 'Life Loss'],
+  control: ['Silence', 'Banish'],
+  aggro: ['Damage', 'Arrival'],
+  ramp: ['Draw', 'Genesis'],
 };
 
 /**
@@ -342,6 +367,15 @@ export function computeStatsFromFormattedCards(cards) {
 
   const avgCost = cardsWithCost > 0 ? +(totalCost / cardsWithCost).toFixed(2) : 0;
 
+  // Keyword breakdown
+  const keywordBreakdown = {};
+  for (const card of cards) {
+    const qty = card.quantity;
+    for (const kw of card.keywords || []) {
+      keywordBreakdown[kw] = (keywordBreakdown[kw] || 0) + qty;
+    }
+  }
+
   return {
     totalCards,
     avgCost,
@@ -352,6 +386,7 @@ export function computeStatsFromFormattedCards(cards) {
     rarityBreakdown,
     siteElementBreakdown,
     typeElementBreakdown,
+    keywordBreakdown,
   };
 }
 

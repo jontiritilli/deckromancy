@@ -1,3 +1,5 @@
+import { useDeckFilter } from '../context/DeckFilterContext';
+
 const ELEMENT_EMOJIS = {
   fire: { emoji: '\u{1F534}', name: 'Fire' },
   water: { emoji: '\u{1F535}', name: 'Water' },
@@ -5,9 +7,13 @@ const ELEMENT_EMOJIS = {
   air: { emoji: '\u{1F7E1}', name: 'Air' },
 };
 
-export default function DeckHeader({ deckName, avatar, stats, collectionCount = 0 }) {
+export default function DeckHeader() {
+  const { deck, filteredStats } = useDeckFilter();
+  const { deckName, avatar } = deck;
+  const { totalCards, deckCardCount, collectionCardCount, avgCost, elementBreakdown } = filteredStats;
+
   // Determine primary elements (non-zero counts)
-  const activeElements = Object.entries(stats.elementBreakdown)
+  const activeElements = Object.entries(elementBreakdown)
     .filter(([el, count]) => count > 0 && el !== 'none')
     .sort(([, a], [, b]) => b - a);
 
@@ -50,19 +56,19 @@ export default function DeckHeader({ deckName, avatar, stats, collectionCount = 
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-gray-300">
             <div>
               <span className="font-bold text-xl text-gray-100">
-                {stats.totalCards + collectionCount}
+                {totalCards}
               </span>
               <span className="ml-1">cards</span>
-              {collectionCount > 0 && (
+              {collectionCardCount > 0 && (
                 <span className="ml-1 text-gray-400">
-                  ({stats.totalCards} deck, {collectionCount} collection)
+                  ({deckCardCount} deck, {collectionCardCount} collection)
                 </span>
               )}
             </div>
             <div>
               <span className="text-gray-400">Avg cost:</span>
               <span className="ml-1 font-bold text-gray-100">
-                {stats.avgCost}
+                {avgCost}
               </span>
             </div>
           </div>

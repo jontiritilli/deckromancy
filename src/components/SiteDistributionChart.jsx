@@ -75,9 +75,10 @@ const options = {
   },
 };
 
-export default function SiteDistributionChart({ siteElementBreakdown, maxThresholds }) {
+export default function SiteDistributionChart() {
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter } = useDeckFilter();
+  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
+  const { siteElementBreakdown, maxThresholds } = filteredStats;
   const activeElement = pageFilter.element;
 
   const elements = ['fire', 'water', 'earth', 'air'];

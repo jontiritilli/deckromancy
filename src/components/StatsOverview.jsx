@@ -1,5 +1,8 @@
-export default function StatsOverview({ stats }) {
-  const { typeBreakdown } = stats;
+import { useDeckFilter } from '../context/DeckFilterContext';
+
+export default function StatsOverview() {
+  const { filteredStats } = useDeckFilter();
+  const { typeBreakdown } = filteredStats;
 
   const statCards = [
     {

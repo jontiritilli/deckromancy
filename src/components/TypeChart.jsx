@@ -30,10 +30,11 @@ const ELEMENT_LABELS = {
   none: 'None',
 };
 
-export default function TypeChart({ typeBreakdown, typeElementBreakdown }) {
+export default function TypeChart() {
   const [drilldownType, setDrilldownType] = useState(null);
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter } = useDeckFilter();
+  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
+  const { typeBreakdown, typeElementBreakdown } = filteredStats;
   const activeType = pageFilter.type;
 
   const handlePieClick = useCallback(
