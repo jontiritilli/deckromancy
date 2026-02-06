@@ -27,7 +27,7 @@ export function useDeck() {
       const sourceUrl = urlOrId.includes('/') ? urlOrId : `https://curiosa.io/decks/${deckId}`;
 
       // Fetch deck data
-      const { decklist, avatar, sideboard, maybeboard } = await fetchDeckById(deckId);
+      const { decklist, avatar, sideboard, maybeboard, deckName } = await fetchDeckById(deckId);
 
       // Analyze the deck
       const analyzedDeck = analyzeDeck(
@@ -36,7 +36,8 @@ export function useDeck() {
         sideboard,
         maybeboard,
         deckId,
-        sourceUrl
+        sourceUrl,
+        deckName
       );
 
       setDeck(analyzedDeck);

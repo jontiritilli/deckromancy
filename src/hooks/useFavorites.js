@@ -23,7 +23,7 @@ export function useFavorites() {
       if (prev.some((f) => f.deckId === deck.deckId)) return prev;
       const next = [...prev, {
         deckId: deck.deckId,
-        name: deck.avatar?.name || deck.deckId,
+        name: deck.deckName || deck.avatar?.name || deck.deckId,
         savedAt: new Date().toISOString(),
       }];
       writeFavorites(next);

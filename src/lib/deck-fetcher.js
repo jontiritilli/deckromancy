@@ -18,11 +18,12 @@ export async function fetchDeckById(deckId) {
   const data = await response.json();
 
   // Extract results from batched response
-  // Index 0: decklist, 1: avatar, 2: sideboard, 3: maybeboard
+  // Index 0: decklist, 1: avatar, 2: sideboard, 3: maybeboard, 4: deck metadata
   const decklist = data[0]?.result?.data?.json ?? [];
   const avatarData = data[1]?.result?.data?.json;
   const sideboard = data[2]?.result?.data?.json ?? [];
   const maybeboard = data[3]?.result?.data?.json ?? [];
+  const deckMeta = data[4]?.result?.data?.json ?? {};
 
   // Avatar comes wrapped in a single object, not an array
   const avatar = avatarData?.card ?? null;
@@ -32,6 +33,7 @@ export async function fetchDeckById(deckId) {
     avatar,
     sideboard,
     maybeboard,
+    deckName: deckMeta.name || null,
   };
 }
 

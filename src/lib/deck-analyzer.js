@@ -363,15 +363,17 @@ export function computeStatsFromFormattedCards(cards) {
  * @param {Array} maybeboard - Raw maybeboard from API
  * @param {string} deckId - The deck ID
  * @param {string} sourceUrl - Original URL
+ * @param {string|null} deckName - User-given deck name
  * @returns {Object} Complete analyzed deck output
  */
-export function analyzeDeck(decklist, avatar, sideboard, maybeboard, deckId, sourceUrl) {
+export function analyzeDeck(decklist, avatar, sideboard, maybeboard, deckId, sourceUrl, deckName) {
   const stats = computeStats(decklist);
   const synergies = aggregateSynergies(decklist);
   const cards = decklist.map(formatCard);
 
   return {
     deckId,
+    deckName: deckName || null,
     sourceUrl,
     fetchedAt: new Date().toISOString(),
     avatar: formatAvatar(avatar),

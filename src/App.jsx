@@ -90,7 +90,7 @@ function DeckContent({ deck, downloadDeckJson, isFavorite, addFavorite, removeFa
       {/* Deck Header + Actions */}
       <div className="flex flex-wrap items-start gap-4">
         <div className="flex-1">
-          <DeckHeader avatar={deck.avatar} stats={filteredStats} collectionCount={deck.sideboard.reduce((sum, c) => sum + c.quantity, 0)} />
+          <DeckHeader deckName={deck.deckName} avatar={deck.avatar} stats={filteredStats} collectionCount={deck.sideboard.reduce((sum, c) => sum + c.quantity, 0)} />
         </div>
         <div className="flex gap-2 pt-1">
           <button

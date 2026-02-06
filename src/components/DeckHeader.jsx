@@ -5,7 +5,7 @@ const ELEMENT_EMOJIS = {
   air: { emoji: '\u{1F7E1}', name: 'Air' },
 };
 
-export default function DeckHeader({ avatar, stats, collectionCount = 0 }) {
+export default function DeckHeader({ deckName, avatar, stats, collectionCount = 0 }) {
   // Determine primary elements (non-zero counts)
   const activeElements = Object.entries(stats.elementBreakdown)
     .filter(([el, count]) => count > 0 && el !== 'none')
@@ -32,11 +32,9 @@ export default function DeckHeader({ avatar, stats, collectionCount = 0 }) {
 
       {/* Deck Info */}
       <div className="flex-1">
-        {avatar && (
-          <h2 className="text-2xl font-bold text-gray-100 mb-2">
-            {avatar.name}
-          </h2>
-        )}
+        <h2 className="text-2xl font-bold text-gray-100 mb-2">
+          {deckName || avatar?.name || 'Untitled Deck'}
+        </h2>
 
         {/* Avatar Stats */}
         {avatar && (

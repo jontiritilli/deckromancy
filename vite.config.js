@@ -8,12 +8,13 @@ const PROCEDURES = [
   'deck.getAvatarById',
   'deck.getSideboardById',
   'deck.getMaybeboardById',
+  'deck.getById',
 ];
 
 function buildCuriosaUrl(deckId) {
   const procedures = PROCEDURES.join(',');
   const input = {};
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < PROCEDURES.length; i++) {
     input[i] = { json: { id: deckId, tracking: false } };
   }
   const encodedInput = encodeURIComponent(JSON.stringify(input));
