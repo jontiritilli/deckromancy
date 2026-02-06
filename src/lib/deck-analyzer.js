@@ -227,6 +227,10 @@ export function formatCard(item) {
     quantity: item.quantity,
     keywords,
     imageUrl,
+    fireThreshold: card.fireThreshold || 0,
+    waterThreshold: card.waterThreshold || 0,
+    earthThreshold: card.earthThreshold || 0,
+    airThreshold: card.airThreshold || 0,
   };
 }
 
@@ -247,6 +251,107 @@ export function formatAvatar(avatar) {
     attack: avatar.attack,
     defense: avatar.defense,
     imageUrl,
+  };
+}
+
+/**
+ * Compute stats from already-formatted cards (as returned by formatCard).
+ * Elements are capitalized names ('Fire', 'Water') — lowercased for stat keys.
+ * @param {Array} cards - Array of formatted card objects
+ * @returns {Object} Statistics object (same shape as computeStats)
+ */
+export function computeStatsFromFormattedCards(cards) {
+  const manaCurve = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, '7+': 0 };
+  const elementBreakdown = { fire: 0, water: 0, earth: 0, air: 0, none: 0 };
+  const maxThresholds = { fire: 0, water: 0, earth: 0, air: 0 };
+  const typeBreakdown = {};
+  const rarityBreakdown = {};
+  const siteElementBreakdown = { fire: 0, water: 0, earth: 0, air: 0, none: 0 };
+  const typeElementBreakdown = {
+    Minion: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    Magic: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    Site: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    Aura: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+  };
+
+  let totalCards = 0;
+  let totalCost = 0;
+  let cardsWithCost = 0;
+
+  for (const card of cards) {
+    const qty = card.quantity;
+    totalCards += qty;
+
+    const cost = card.cost;
+    if (cost !== null && cost !== undefined) {
+      const bucket = cost >= 7 ? '7+' : cost;
+      manaCurve[bucket] = (manaCurve[bucket] || 0) + qty;
+      totalCost += cost * qty;
+      cardsWithCost += qty;
+    }
+
+    const elements = card.elements || [];
+    if (elements.length === 0) {
+      elementBreakdown.none += qty;
+    } else {
+      for (const el of elements) {
+        const elKey = el.toLowerCase();
+        if (Object.prototype.hasOwnProperty.call(elementBreakdown, elKey)) {
+          elementBreakdown[elKey] += qty;
+        }
+      }
+    }
+
+    if ((card.fireThreshold || 0) > maxThresholds.fire) maxThresholds.fire = card.fireThreshold;
+    if ((card.waterThreshold || 0) > maxThresholds.water) maxThresholds.water = card.waterThreshold;
+    if ((card.earthThreshold || 0) > maxThresholds.earth) maxThresholds.earth = card.earthThreshold;
+    if ((card.airThreshold || 0) > maxThresholds.air) maxThresholds.air = card.airThreshold;
+
+    const type = card.type || 'Unknown';
+    typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
+
+    if (type === 'Site') {
+      if (elements.length === 0) {
+        siteElementBreakdown.none += qty;
+      } else {
+        for (const el of elements) {
+          const elKey = el.toLowerCase();
+          if (Object.prototype.hasOwnProperty.call(siteElementBreakdown, elKey)) {
+            siteElementBreakdown[elKey] += qty;
+          }
+        }
+      }
+    }
+
+    if (typeElementBreakdown[type]) {
+      if (elements.length === 0) {
+        typeElementBreakdown[type].none += qty;
+      } else {
+        for (const el of elements) {
+          const elKey = el.toLowerCase();
+          if (Object.prototype.hasOwnProperty.call(typeElementBreakdown[type], elKey)) {
+            typeElementBreakdown[type][elKey] += qty;
+          }
+        }
+      }
+    }
+
+    const rarity = card.rarity || 'Unknown';
+    rarityBreakdown[rarity] = (rarityBreakdown[rarity] || 0) + qty;
+  }
+
+  const avgCost = cardsWithCost > 0 ? +(totalCost / cardsWithCost).toFixed(2) : 0;
+
+  return {
+    totalCards,
+    avgCost,
+    manaCurve,
+    elementBreakdown,
+    maxThresholds,
+    typeBreakdown,
+    rarityBreakdown,
+    siteElementBreakdown,
+    typeElementBreakdown,
   };
 }
 

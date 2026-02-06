@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie, Doughnut, getElementAtEvent } from 'react-chartjs-2';
+import { useDeckFilter } from '../context/DeckFilterContext';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -32,6 +33,8 @@ const ELEMENT_LABELS = {
 export default function TypeChart({ typeBreakdown, typeElementBreakdown }) {
   const [drilldownType, setDrilldownType] = useState(null);
   const chartRef = useRef(null);
+  const { pageFilter, toggleFilter } = useDeckFilter();
+  const activeType = pageFilter.type;
 
   const handlePieClick = useCallback(
     (event) => {
@@ -40,20 +43,23 @@ export default function TypeChart({ typeBreakdown, typeElementBreakdown }) {
       if (elems.length === 0) return;
       const index = elems[0].index;
       const label = Object.keys(typeBreakdown)[index];
-      if (label && typeElementBreakdown?.[label]) {
-        setDrilldownType(label);
+      if (label) {
+        toggleFilter('type', label);
       }
     },
-    [typeBreakdown, typeElementBreakdown],
+    [typeBreakdown, toggleFilter],
   );
 
-  // Top-level: Pie of card types
-  if (drilldownType === null) {
-    const labels = Object.keys(typeBreakdown);
-    const dataValues = Object.values(typeBreakdown);
-    const colors = labels.map(
-      (type) => TYPE_COLORS[type] || TYPE_COLORS.Unknown,
+  // Drilldown view: Doughnut of element breakdown for the selected type
+  if (drilldownType !== null) {
+    const breakdown = typeElementBreakdown[drilldownType] || {};
+    const activeElements = Object.entries(breakdown).filter(
+      ([, count]) => count > 0,
     );
+
+    const labels = activeElements.map(([el]) => ELEMENT_LABELS[el] || el);
+    const dataValues = activeElements.map(([, count]) => count);
+    const colors = activeElements.map(([el]) => ELEMENT_COLORS[el] || '#6b7280');
 
     const data = {
       labels,
@@ -81,7 +87,7 @@ export default function TypeChart({ typeBreakdown, typeElementBreakdown }) {
         },
         title: {
           display: true,
-          text: 'Card Types',
+          text: `${drilldownType} Elements`,
           color: '#e5e7eb',
           font: {
             size: 16,
@@ -92,26 +98,26 @@ export default function TypeChart({ typeBreakdown, typeElementBreakdown }) {
     };
 
     return (
-      <div className="bg-gray-800 rounded-lg p-4 h-64">
-        <Pie
-          ref={chartRef}
-          options={options}
-          data={data}
-          onClick={handlePieClick}
-        />
+      <div className="bg-gray-800 rounded-lg p-4 h-64 relative">
+        <button
+          onClick={() => setDrilldownType(null)}
+          className="absolute top-2 right-2 z-10 px-2 py-1 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded text-xs text-gray-300 transition-colors"
+        >
+          Back to Types
+        </button>
+        <Doughnut options={options} data={data} />
       </div>
     );
   }
 
-  // Drilled down: Doughnut of element breakdown for the selected type
-  const breakdown = typeElementBreakdown[drilldownType] || {};
-  const activeElements = Object.entries(breakdown).filter(
-    ([, count]) => count > 0,
-  );
-
-  const labels = activeElements.map(([el]) => ELEMENT_LABELS[el] || el);
-  const dataValues = activeElements.map(([, count]) => count);
-  const colors = activeElements.map(([el]) => ELEMENT_COLORS[el] || '#6b7280');
+  // Top-level: Pie of card types
+  const labels = Object.keys(typeBreakdown);
+  const dataValues = Object.values(typeBreakdown);
+  const colors = labels.map((type) => {
+    const base = TYPE_COLORS[type] || TYPE_COLORS.Unknown;
+    if (activeType === null) return base;
+    return type === activeType ? base : base + '33';
+  });
 
   const data = {
     labels,
@@ -139,7 +145,7 @@ export default function TypeChart({ typeBreakdown, typeElementBreakdown }) {
       },
       title: {
         display: true,
-        text: `${drilldownType} Elements`,
+        text: 'Card Types',
         color: '#e5e7eb',
         font: {
           size: 16,
@@ -149,15 +155,25 @@ export default function TypeChart({ typeBreakdown, typeElementBreakdown }) {
     },
   };
 
+  // Show "View Elements" button when a type is selected via page filter and has element data
+  const canDrilldown = activeType && typeElementBreakdown?.[activeType];
+
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-64 relative">
-      <button
-        onClick={() => setDrilldownType(null)}
-        className="absolute top-2 right-2 z-10 px-2 py-1 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded text-xs text-gray-300 transition-colors"
-      >
-        Back to Types
-      </button>
-      <Doughnut options={options} data={data} />
+    <div className="bg-gray-800 rounded-lg p-4 h-64 relative [&_canvas]:!cursor-pointer">
+      {canDrilldown && (
+        <button
+          onClick={() => setDrilldownType(activeType)}
+          className="absolute top-2 right-2 z-10 px-2 py-1 bg-purple-700 hover:bg-purple-600 border border-purple-500 rounded text-xs text-purple-100 transition-colors"
+        >
+          View Elements &rarr;
+        </button>
+      )}
+      <Pie
+        ref={chartRef}
+        options={options}
+        data={data}
+        onClick={handlePieClick}
+      />
     </div>
   );
 }

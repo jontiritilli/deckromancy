@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,7 +8,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+import { Bar, getElementAtEvent } from 'react-chartjs-2';
+import { useDeckFilter } from '../context/DeckFilterContext';
 
 ChartJS.register(
   CategoryScale,
@@ -74,6 +76,10 @@ const options = {
 };
 
 export default function SiteDistributionChart({ siteElementBreakdown, maxThresholds }) {
+  const chartRef = useRef(null);
+  const { pageFilter, toggleFilter } = useDeckFilter();
+  const activeElement = pageFilter.element;
+
   const elements = ['fire', 'water', 'earth', 'air'];
 
   // Only show elements that have either sites or a threshold > 0
@@ -81,12 +87,30 @@ export default function SiteDistributionChart({ siteElementBreakdown, maxThresho
     (el) => siteElementBreakdown[el] > 0 || maxThresholds[el] > 0
   );
 
+  const labels = active.map((el) => ELEMENT_LABELS[el]);
+
+  const handleClick = useCallback(
+    (event) => {
+      if (!chartRef.current) return;
+      const elems = getElementAtEvent(chartRef.current, event);
+      if (elems.length === 0) return;
+      const index = elems[0].index;
+      const clickedLabel = labels[index];
+      toggleFilter('element', clickedLabel);
+    },
+    [toggleFilter, labels],
+  );
+
   if (active.length === 0) return null;
 
-  const labels = active.map((el) => ELEMENT_LABELS[el]);
   const siteData = active.map((el) => siteElementBreakdown[el]);
   const thresholdData = active.map((el) => maxThresholds[el]);
-  const colors = active.map((el) => ELEMENT_COLORS[el]);
+  const colors = active.map((el) => {
+    const base = ELEMENT_COLORS[el];
+    const label = ELEMENT_LABELS[el];
+    if (activeElement === null) return base;
+    return label === activeElement ? base : base + '33';
+  });
 
   const data = {
     labels,
@@ -95,14 +119,14 @@ export default function SiteDistributionChart({ siteElementBreakdown, maxThresho
         label: 'Sites Owned',
         data: siteData,
         backgroundColor: colors,
-        borderColor: colors.map((c) => c),
+        borderColor: colors,
         borderWidth: 1,
         borderRadius: 4,
       },
       {
         label: 'Max Threshold',
         data: thresholdData,
-        backgroundColor: colors.map((c) => c + '55'),
+        backgroundColor: colors.map((c) => c.length <= 7 ? c + '55' : c.slice(0, 7) + '55'),
         borderColor: colors,
         borderWidth: 2,
         borderDash: [4, 4],
@@ -112,8 +136,8 @@ export default function SiteDistributionChart({ siteElementBreakdown, maxThresho
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-64">
-      <Bar options={options} data={data} />
+    <div className="bg-gray-800 rounded-lg p-4 h-64 [&_canvas]:!cursor-pointer">
+      <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );
 }

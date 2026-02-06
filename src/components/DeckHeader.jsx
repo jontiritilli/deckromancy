@@ -5,16 +5,11 @@ const ELEMENT_EMOJIS = {
   air: { emoji: '\u{1F7E1}', name: 'Air' },
 };
 
-export default function DeckHeader({ avatar, stats }) {
+export default function DeckHeader({ avatar, stats, collectionCount = 0 }) {
   // Determine primary elements (non-zero counts)
   const activeElements = Object.entries(stats.elementBreakdown)
     .filter(([el, count]) => count > 0 && el !== 'none')
     .sort(([, a], [, b]) => b - a);
-
-  const elementSummary = activeElements
-    .map(([el]) => ELEMENT_EMOJIS[el]?.name)
-    .filter(Boolean)
-    .join('/');
 
   return (
     <div className="flex gap-6 items-start">
@@ -38,7 +33,9 @@ export default function DeckHeader({ avatar, stats }) {
       {/* Deck Info */}
       <div className="flex-1">
         {avatar && (
-          <h2 className="text-2xl font-bold text-gray-100 mb-2">{avatar.name}</h2>
+          <h2 className="text-2xl font-bold text-gray-100 mb-2">
+            {avatar.name}
+          </h2>
         )}
 
         {/* Avatar Stats */}
@@ -52,21 +49,24 @@ export default function DeckHeader({ avatar, stats }) {
 
         {/* Deck Summary */}
         <div className="bg-gray-800 rounded-lg p-4 inline-block">
-          <div className="flex gap-6 text-gray-300">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-gray-300">
             <div>
-              <span className="font-bold text-xl text-gray-100">{stats.totalCards}</span>
+              <span className="font-bold text-xl text-gray-100">
+                {stats.totalCards + collectionCount}
+              </span>
               <span className="ml-1">cards</span>
+              {collectionCount > 0 && (
+                <span className="ml-1 text-gray-400">
+                  ({stats.totalCards} deck, {collectionCount} collection)
+                </span>
+              )}
             </div>
             <div>
               <span className="text-gray-400">Avg cost:</span>
-              <span className="ml-1 font-bold text-gray-100">{stats.avgCost}</span>
+              <span className="ml-1 font-bold text-gray-100">
+                {stats.avgCost}
+              </span>
             </div>
-            {elementSummary && (
-              <div>
-                <span className="text-purple-400">{elementSummary}</span>
-                <span className="ml-1 text-gray-400">deck</span>
-              </div>
-            )}
           </div>
 
           {/* Element breakdown with emojis */}

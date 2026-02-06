@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useDeckFilter } from '../context/DeckFilterContext';
 
 const ELEMENT_COLORS = {
   Fire: 'text-red-400',
@@ -25,10 +26,12 @@ const RARITY_COLORS = {
 const RARITY_ORDER = ['Ordinary', 'Exceptional', 'Elite', 'Unique'];
 
 export default function CardList({ cards, title = 'Cards' }) {
+  const { pageFilter } = useDeckFilter();
   const [filter, setFilter] = useState({ type: '', element: '', rarity: '' });
   const [sortBy, setSortBy] = useState('name');
   const [sortDir, setSortDir] = useState('asc');
   const [copied, setCopied] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [hover, setHover] = useState({ visible: false, imageUrl: null, x: 0, y: 0 });
 
   // Get unique types, elements, and rarities for filter options
@@ -51,6 +54,28 @@ export default function CardList({ cards, title = 'Cards' }) {
   const filteredCards = useMemo(() => {
     let result = cards;
 
+    // Page-level filters (from chart clicks)
+    if (pageFilter.cost !== null) {
+      result = result.filter((c) => {
+        if (c.cost === null) return false;
+        if (pageFilter.cost === '7+') return c.cost >= 7;
+        return c.cost === Number(pageFilter.cost);
+      });
+    }
+
+    if (pageFilter.type) {
+      result = result.filter((c) => c.type === pageFilter.type);
+    }
+
+    if (pageFilter.rarity) {
+      result = result.filter((c) => c.rarity === pageFilter.rarity);
+    }
+
+    if (pageFilter.element) {
+      result = result.filter((c) => c.elements.includes(pageFilter.element));
+    }
+
+    // Local dropdown filters
     if (filter.type) {
       result = result.filter((c) => c.type === filter.type);
     }
@@ -81,7 +106,7 @@ export default function CardList({ cards, title = 'Cards' }) {
     });
 
     return result;
-  }, [cards, filter, sortBy, sortDir]);
+  }, [cards, pageFilter, filter, sortBy, sortDir]);
 
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -140,13 +165,17 @@ export default function CardList({ cards, title = 'Cards' }) {
 
   return (
     <div className="bg-gray-800 rounded-lg p-4">
-      <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
-        <h3 className="text-lg font-bold text-gray-100">
+      <div className="flex flex-wrap justify-between items-center gap-3">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="flex items-center gap-2 text-lg font-bold text-gray-100 hover:text-gray-300 transition-colors"
+        >
+          <span className={`text-sm transition-transform ${collapsed ? '' : 'rotate-90'}`}>&#9654;</span>
           {title} ({filteredCards.reduce((sum, c) => sum + c.quantity, 0)} cards, {filteredCards.length} unique)
-        </h3>
+        </button>
 
         {/* Filters + Copy */}
-        <div className="flex flex-wrap gap-3 items-center">
+        {!collapsed && <div className="flex flex-wrap gap-3 items-center">
           <select
             value={filter.type}
             onChange={(e) => setFilter({ ...filter, type: e.target.value })}
@@ -192,11 +221,11 @@ export default function CardList({ cards, title = 'Cards' }) {
           >
             {copied ? 'Copied!' : 'Copy List'}
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Card Grid */}
-      <div className="overflow-x-auto">
+      {!collapsed && <div className="overflow-x-auto mt-4">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-gray-400 border-b border-gray-700">
@@ -295,7 +324,7 @@ export default function CardList({ cards, title = 'Cards' }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </div>}
 
       {/* Card Hover Preview */}
       {hover.visible && hover.imageUrl && previewStyle && (

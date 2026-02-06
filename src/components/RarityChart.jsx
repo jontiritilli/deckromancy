@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,7 +8,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+import { Bar, getElementAtEvent } from 'react-chartjs-2';
+import { useDeckFilter } from '../context/DeckFilterContext';
 
 ChartJS.register(
   CategoryScale,
@@ -67,10 +69,18 @@ const options = {
 };
 
 export default function RarityChart({ rarityBreakdown }) {
+  const chartRef = useRef(null);
+  const { pageFilter, toggleFilter } = useDeckFilter();
+  const activeRarity = pageFilter.rarity;
+
   // Sort rarities in a consistent order
   const labels = RARITY_ORDER.filter((r) => rarityBreakdown[r] > 0);
   const dataValues = labels.map((r) => rarityBreakdown[r]);
-  const colors = labels.map((r) => RARITY_COLORS[r] || '#6b7280');
+  const colors = labels.map((r) => {
+    const base = RARITY_COLORS[r] || '#6b7280';
+    if (activeRarity === null) return base;
+    return r === activeRarity ? base : base + '33';
+  });
 
   const data = {
     labels,
@@ -79,16 +89,27 @@ export default function RarityChart({ rarityBreakdown }) {
         label: 'Cards',
         data: dataValues,
         backgroundColor: colors,
-        borderColor: colors.map((c) => c),
+        borderColor: colors,
         borderWidth: 1,
         borderRadius: 4,
       },
     ],
   };
 
+  const handleClick = useCallback(
+    (event) => {
+      if (!chartRef.current) return;
+      const elems = getElementAtEvent(chartRef.current, event);
+      if (elems.length === 0) return;
+      const index = elems[0].index;
+      toggleFilter('rarity', labels[index]);
+    },
+    [toggleFilter, labels],
+  );
+
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-64">
-      <Bar options={options} data={data} />
+    <div className="bg-gray-800 rounded-lg p-4 h-64 [&_canvas]:!cursor-pointer">
+      <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );
 }
