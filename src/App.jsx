@@ -25,8 +25,18 @@ const FILTER_LABELS = {
 function ActiveFilterChips() {
   const { pageFilter, toggleFilter, clearFilters } = useDeckFilter();
 
-  const activeEntries = Object.entries(pageFilter).filter(([, v]) => v !== null);
-  if (activeEntries.length === 0) return null;
+  const activeEntries = Object.entries(pageFilter).filter(
+    ([, v]) => v !== null,
+  );
+  if (activeEntries.length === 0)
+    return (
+      <button
+        key="no-filters"
+        className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-900/40 border border-purple-500/50 rounded-full text-sm text-purple-200 hover:bg-purple-800/50 transition-colors"
+      >
+        No Filters
+      </button>
+    );
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -36,7 +46,9 @@ function ActiveFilterChips() {
           onClick={() => toggleFilter(dimension, value)}
           className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-900/40 border border-purple-500/50 rounded-full text-sm text-purple-200 hover:bg-purple-800/50 transition-colors"
         >
-          <span className="text-purple-400 font-medium">{FILTER_LABELS[dimension]}:</span>
+          <span className="text-purple-400 font-medium">
+            {FILTER_LABELS[dimension]}:
+          </span>
           {value}
           <span className="ml-0.5 text-purple-400">&times;</span>
         </button>
@@ -51,7 +63,12 @@ function ActiveFilterChips() {
   );
 }
 
-function DeckContent({ downloadDeckJson, isFavorite, addFavorite, removeFavorite }) {
+function DeckContent({
+  downloadDeckJson,
+  isFavorite,
+  addFavorite,
+  removeFavorite,
+}) {
   const { deck } = useDeckFilter();
 
   return (
@@ -85,6 +102,9 @@ function DeckContent({ downloadDeckJson, isFavorite, addFavorite, removeFavorite
         </div>
       </div>
 
+      {/* Active Filter Chips */}
+      <ActiveFilterChips />
+
       {/* Stats Overview */}
       <StatsOverview />
 
@@ -95,9 +115,6 @@ function DeckContent({ downloadDeckJson, isFavorite, addFavorite, removeFavorite
         <RarityChart />
         <SiteDistributionChart />
       </div>
-
-      {/* Active Filter Chips */}
-      <ActiveFilterChips />
 
       {/* Synergies */}
       <SynergyTags />
