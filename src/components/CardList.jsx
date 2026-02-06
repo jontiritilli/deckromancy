@@ -154,23 +154,25 @@ export default function CardList({ cards, title = 'Cards' }) {
   };
 
   // Compute preview position anchored to thumbnail
-  const previewStyle = hover.visible && hover.rect
-    ? (() => {
-        const imgW = 350;
-        const imgH = 500;
-        const rect = hover.rect;
-        // Horizontal: try right, flip to left if needed
-        let x = rect.right + 8;
-        if (x + imgW > window.innerWidth) {
-          x = rect.left - imgW - 8;
-        }
-        // Vertical: center on thumbnail, clamp to viewport
-        let y = rect.top + rect.height / 2 - imgH / 2;
-        if (y < 8) y = 8;
-        if (y + imgH > window.innerHeight - 8) y = window.innerHeight - imgH - 8;
-        return { left: x, top: y, width: imgW, height: imgH };
-      })()
-    : null;
+  const previewStyle =
+    hover.visible && hover.rect
+      ? (() => {
+          const imgW = 350;
+          const imgH = 500;
+          const rect = hover.rect;
+          // Horizontal: try right, flip to left if needed
+          let x = rect.right + 8;
+          if (x + imgW > window.innerWidth) {
+            x = rect.left - imgW - 8;
+          }
+          // Vertical: center on thumbnail, clamp to viewport
+          let y = rect.top + rect.height / 2 - imgH / 2;
+          if (y < 8) y = 8;
+          if (y + imgH > window.innerHeight - 8)
+            y = window.innerHeight - imgH - 8;
+          return { left: x, top: y, width: imgW, height: imgH };
+        })()
+      : null;
 
   return (
     <div className="section-panel overflow-hidden border-t-4 border-t-rosy-granite-500/60 p-0">
@@ -224,7 +226,9 @@ export default function CardList({ cards, title = 'Cards' }) {
 
               <select
                 value={filter.rarity}
-                onChange={(e) => setFilter({ ...filter, rarity: e.target.value })}
+                onChange={(e) =>
+                  setFilter({ ...filter, rarity: e.target.value })
+                }
                 className="w-full sm:w-auto min-h-[44px] py-2 px-3 bg-shadow-grey-700 border border-shadow-grey-600 border-l-2 border-l-rosy-granite-400/50 rounded text-sm text-shadow-grey-200"
               >
                 <option value="">All Rarities</option>
@@ -234,7 +238,6 @@ export default function CardList({ cards, title = 'Cards' }) {
                   </option>
                 ))}
               </select>
-
             </div>
           )}
         </div>
@@ -293,11 +296,17 @@ export default function CardList({ cards, title = 'Cards' }) {
                   onClick={() => setPreviewCard(card)}
                 >
                   {card.imageUrl ? (
-                    <div className="aspect-[5/7] overflow-hidden">
+                    <div
+                      className={
+                        card.isRotated
+                          ? 'aspect-[7/5] overflow-hidden'
+                          : 'aspect-[5/7] overflow-hidden'
+                      }
+                    >
                       <img
                         src={card.imageUrl}
                         alt={card.name}
-                        className={`w-full h-full object-cover ${card.isRotated ? 'rotate-90 scale-[1.33]' : ''}`}
+                        className="w-full h-full object-cover"
                         loading="lazy"
                       />
                     </div>
@@ -307,12 +316,21 @@ export default function CardList({ cards, title = 'Cards' }) {
                     </div>
                   )}
                   <div className="p-2">
-                    <div className="text-xs font-medium text-shadow-grey-200 truncate">{card.name}</div>
+                    <div className="text-xs font-medium text-shadow-grey-200 truncate">
+                      {card.name}
+                    </div>
                     <div className="flex items-center justify-between mt-1">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] ${TYPE_COLORS[card.type] || 'bg-shadow-grey-700 text-shadow-grey-300'}`}>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                          TYPE_COLORS[card.type] ||
+                          'bg-shadow-grey-700 text-shadow-grey-300'
+                        }`}
+                      >
                         {card.type}
                       </span>
-                      <span className="text-[10px] text-shadow-grey-400">x{card.quantity}</span>
+                      <span className="text-[10px] text-shadow-grey-400">
+                        x{card.quantity}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -362,19 +380,31 @@ export default function CardList({ cards, title = 'Cards' }) {
                   {filteredCards.map((card, idx) => (
                     <tr
                       key={`${card.name}-${idx}`}
-                      className="border-b border-shadow-grey-700/50 hover:bg-rosy-granite-900/20 even:bg-shadow-grey-900/30"
+                      className="border-b border-shadow-grey-700/50 hover:bg-rosy-granite-900/20 even:bg-shadow-grey-900/30 cursor-pointer"
+                      onClick={() => setPreviewCard(card)}
                     >
-                      <td className="py-2 pr-4">
+                      <td className="py-2 pr-4 flex items-center justify-center">
                         {card.imageUrl ? (
-                          <div className={`overflow-hidden rounded ${card.isRotated ? 'w-16 h-12' : 'w-12 h-16'}`}>
+                          <div
+                            className={`overflow-hidden rounded ${
+                              card.isRotated
+                                ? 'w-12 h-16 rotate-90'
+                                : 'w-12 h-16'
+                            }`}
+                          >
                             <img
                               src={card.imageUrl}
                               alt={card.name}
-                              className={`w-full h-full object-cover cursor-zoom-in ${card.isRotated ? 'rotate-90 scale-[1.33]' : ''}`}
+                              className="w-full h-full object-cover cursor-zoom-in"
                               loading="lazy"
-                              onMouseEnter={isMobile ? undefined : (e) => handleMouseEnter(e, card)}
-                              onMouseLeave={isMobile ? undefined : handleMouseLeave}
-                              onClick={isMobile ? () => setPreviewCard(card) : undefined}
+                              onMouseEnter={
+                                isMobile
+                                  ? undefined
+                                  : (e) => handleMouseEnter(e, card)
+                              }
+                              onMouseLeave={
+                                isMobile ? undefined : handleMouseLeave
+                              }
                             />
                           </div>
                         ) : (
@@ -389,7 +419,8 @@ export default function CardList({ cards, title = 'Cards' }) {
                       <td className="py-2 pr-4">
                         <span
                           className={`px-2 py-0.5 rounded text-xs ${
-                            TYPE_COLORS[card.type] || 'bg-shadow-grey-700 text-shadow-grey-300'
+                            TYPE_COLORS[card.type] ||
+                            'bg-shadow-grey-700 text-shadow-grey-300'
                           }`}
                         >
                           {card.type}
@@ -421,7 +452,9 @@ export default function CardList({ cards, title = 'Cards' }) {
                             </span>
                           ))}
                           {card.elements.length === 0 && (
-                            <span className="text-xs text-shadow-grey-500">-</span>
+                            <span className="text-xs text-shadow-grey-500">
+                              -
+                            </span>
                           )}
                         </div>
                       </td>
@@ -438,48 +471,160 @@ export default function CardList({ cards, title = 'Cards' }) {
       )}
 
       {/* Desktop Card Hover Preview — portaled to body to escape overflow-hidden / backdrop-blur containing block */}
-      {!isMobile && hover.visible && hover.imageUrl && previewStyle && createPortal(
-        <div className="fixed z-50 pointer-events-none" style={previewStyle}>
-          <img
-            src={hover.imageUrl}
-            alt="Card preview"
-            className={`w-full h-full object-cover rounded-lg shadow-2xl border border-pacific-cyan-600/30 shadow-pacific-cyan-900/30 ${
-              hover.isRotated ? 'rotate-90' : ''
-            }`}
-          />
-        </div>,
-        document.body,
-      )}
+      {!isMobile &&
+        hover.visible &&
+        hover.imageUrl &&
+        previewStyle &&
+        createPortal(
+          <div className="fixed z-50 pointer-events-none" style={previewStyle}>
+            <img
+              src={hover.imageUrl}
+              alt="Card preview"
+              className={`w-full h-full object-cover rounded-lg shadow-2xl border border-pacific-cyan-600/30 shadow-pacific-cyan-900/30 ${
+                hover.isRotated ? 'rotate-90' : ''
+              }`}
+            />
+          </div>,
+          document.body,
+        )}
 
-      {/* Tap Preview Modal — portaled to body */}
-      {previewCard && createPortal(
-        <div
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setPreviewCard(null)}
-        >
-          <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setPreviewCard(null)}
-              className="absolute -top-3 -right-3 z-10 w-8 h-8 bg-shadow-grey-700 hover:bg-shadow-grey-600 border border-shadow-grey-500 rounded-full flex items-center justify-center text-shadow-grey-200 text-lg leading-none transition-colors"
+      {/* Card Detail Modal — portaled to body */}
+      {previewCard &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setPreviewCard(null)}
+          >
+            <div
+              className="relative bg-shadow-grey-800 border border-shadow-grey-600 rounded-xl shadow-2xl max-h-[90vh] max-w-2xl w-full overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
             >
-              &times;
-            </button>
-            {previewCard.imageUrl && (
-              <img
-                src={previewCard.imageUrl}
-                alt={previewCard.name}
-                className={`max-h-[80vh] max-w-[calc(100vw-2rem)] object-contain rounded-lg shadow-2xl ${
-                  previewCard.isRotated ? 'rotate-90' : ''
-                }`}
-              />
-            )}
-            <div className="mt-2 text-center text-shadow-grey-200 font-medium text-sm">
-              {previewCard.name}
+              <button
+                onClick={() => setPreviewCard(null)}
+                className="absolute top-2 right-2 z-10 w-8 h-8 bg-shadow-grey-700 hover:bg-shadow-grey-600 border border-shadow-grey-500 rounded-full flex items-center justify-center text-shadow-grey-200 text-lg leading-none transition-colors"
+              >
+                &times;
+              </button>
+
+              <div className="p-4">
+                <div className="flex gap-4 mb-3">
+                  {previewCard.imageUrl && (
+                    <div className="shrink-0 w-80 h-80 flex items-center justify-center overflow-hidden rounded-lg">
+                      <img
+                        src={previewCard.imageUrl}
+                        alt={previewCard.name}
+                        className={`max-h-full max-w-full rounded-lg ${
+                          previewCard.isRotated ? 'rotate-90' : ''
+                        }`}
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0 space-y-2 pt-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-lg font-bold text-shadow-grey-50 leading-tight">
+                        {previewCard.name}
+                      </h3>
+                      <span className="text-sm text-shadow-grey-400 shrink-0">
+                        x{previewCard.quantity}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs ${
+                          TYPE_COLORS[previewCard.type] ||
+                          'bg-shadow-grey-700 text-shadow-grey-300'
+                        }`}
+                      >
+                        {previewCard.type}
+                      </span>
+                      {previewCard.cost !== null && (
+                        <span className="px-2 py-0.5 rounded text-xs bg-pacific-cyan-900/40 text-pacific-cyan-200">
+                          Cost {previewCard.cost}
+                        </span>
+                      )}
+                      {previewCard.rarity && (
+                        <span
+                          className={`px-2 py-0.5 rounded text-xs ${
+                            RARITY_COLORS[previewCard.rarity] ||
+                            'bg-shadow-grey-700 text-shadow-grey-300'
+                          }`}
+                        >
+                          {previewCard.rarity}
+                        </span>
+                      )}
+                    </div>
+
+                    {previewCard.elements.length > 0 && (
+                      <div className="flex gap-2">
+                        {previewCard.elements.map((el) => (
+                          <span
+                            key={el}
+                            className={`text-sm font-medium ${
+                              ELEMENT_COLORS[el] || 'text-shadow-grey-400'
+                            }`}
+                          >
+                            {el}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {(previewCard.fireThreshold > 0 ||
+                      previewCard.waterThreshold > 0 ||
+                      previewCard.earthThreshold > 0 ||
+                      previewCard.airThreshold > 0) && (
+                      <div className="flex flex-wrap gap-1.5 text-xs">
+                        {previewCard.fireThreshold > 0 && (
+                          <span className="px-2 py-0.5 rounded bg-[#dd7230]/15 text-[#dd7230]">
+                            Fire {previewCard.fireThreshold}
+                          </span>
+                        )}
+                        {previewCard.waterThreshold > 0 && (
+                          <span className="px-2 py-0.5 rounded bg-[#208aae]/15 text-[#208aae]">
+                            Water {previewCard.waterThreshold}
+                          </span>
+                        )}
+                        {previewCard.earthThreshold > 0 && (
+                          <span className="px-2 py-0.5 rounded bg-[#79b791]/15 text-[#79b791]">
+                            Earth {previewCard.earthThreshold}
+                          </span>
+                        )}
+                        {previewCard.airThreshold > 0 && (
+                          <span className="px-2 py-0.5 rounded bg-[#ffd131]/15 text-[#ffd131]">
+                            Air {previewCard.airThreshold}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Rules text */}
+                {previewCard.rulesText && (
+                  <p className="text-sm text-shadow-grey-300 leading-relaxed whitespace-pre-line border-t border-shadow-grey-700 pt-3 mt-3">
+                    {previewCard.rulesText}
+                  </p>
+                )}
+
+                {/* Keywords */}
+                {previewCard.keywords?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 border-t border-shadow-grey-700 pt-3 mt-3">
+                    {previewCard.keywords.map((kw) => (
+                      <span
+                        key={kw}
+                        className="px-2 py-0.5 rounded-full text-xs bg-rosy-granite-900/50 border border-rosy-granite-500/30 text-rosy-granite-200"
+                      >
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </div>,
-        document.body,
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
