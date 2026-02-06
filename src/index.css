@@ -26,6 +26,6 @@ body {
     @apply text-xs font-bold uppercase tracking-widest mb-3;
   }
   .divider-gradient {
-    @apply h-px bg-gradient-to-r from-transparent via-rosy-granite-500/40 to-transparent my-8;
+    @apply h-px bg-gradient-to-r from-transparent via-rosy-granite-500/40 to-transparent my-4 md:my-8;
   }
 }

@@ -37,22 +37,39 @@ function applyPageFilter(cards, pageFilter) {
 
 export function DeckFilterProvider({ deck, children }) {
   const [pageFilter, setPageFilter] = useState(INITIAL_FILTER);
+  const [includeCollection, setIncludeCollection] = useState(false);
 
   // Reset filters when the deck changes
   useEffect(() => {
     setPageFilter(INITIAL_FILTER);
+    setIncludeCollection(false);
   }, [deck.deckId]);
 
+  // Always-inclusive stats for the header (deck + collection, ignores includeCollection toggle)
+  const headerStats = useMemo(() => {
+    const allCards = [...deck.cards, ...deck.sideboard];
+    const stats = computeStatsFromFormattedCards(allCards);
+    const deckCardCount = deck.cards.reduce((sum, c) => sum + c.quantity, 0);
+    const collectionCardCount = deck.sideboard.reduce((sum, c) => sum + c.quantity, 0);
+    return { ...stats, deckCardCount, collectionCardCount };
+  }, [deck.cards, deck.sideboard]);
+
+  // Stats for everything below the header (respects includeCollection + page filters)
   const filteredStats = useMemo(() => {
     const filteredDeck = applyPageFilter(deck.cards, pageFilter);
     const filteredSideboard = applyPageFilter(deck.sideboard, pageFilter);
-    const stats = computeStatsFromFormattedCards([...filteredDeck, ...filteredSideboard]);
+    const statsCards = includeCollection
+      ? [...filteredDeck, ...filteredSideboard]
+      : filteredDeck;
+    const stats = computeStatsFromFormattedCards(statsCards);
     return {
       ...stats,
       deckCardCount: filteredDeck.reduce((sum, c) => sum + c.quantity, 0),
-      collectionCardCount: filteredSideboard.reduce((sum, c) => sum + c.quantity, 0),
+      collectionCardCount: includeCollection
+        ? filteredSideboard.reduce((sum, c) => sum + c.quantity, 0)
+        : 0,
     };
-  }, [deck.cards, deck.sideboard, pageFilter]);
+  }, [deck.cards, deck.sideboard, pageFilter, includeCollection]);
 
   const toggleFilter = useCallback((dimension, value) => {
     setPageFilter((prev) => ({
@@ -66,7 +83,7 @@ export function DeckFilterProvider({ deck, children }) {
   }, []);
 
   return (
-    <DeckFilterContext.Provider value={{ deck, pageFilter, toggleFilter, clearFilters, filteredStats }}>
+    <DeckFilterContext.Provider value={{ deck, pageFilter, toggleFilter, clearFilters, headerStats, filteredStats, includeCollection, setIncludeCollection }}>
       {children}
     </DeckFilterContext.Provider>
   );

@@ -113,7 +113,7 @@ function CategoryChart({ category, keywords, activeKeyword, toggleFilter }) {
   const height = Math.max(120, keywords.length * 28 + 50);
 
   return (
-    <div className={`section-panel p-4 [&_canvas]:!cursor-pointer ${accent}`} style={{ height }}>
+    <div className={`section-panel p-3 sm:p-4 [&_canvas]:!cursor-pointer ${accent}`} style={{ height }}>
       <Bar ref={chartRef} options={buildChartOptions(category)} data={data} onClick={handleClick} />
     </div>
   );
@@ -153,7 +153,7 @@ export default function SynergyTags() {
       {activeCategories.length > 0 && (
         <>
           <div className="section-label text-shadow-grey-400">Keyword Synergies</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {activeCategories.map((category) => (
               <CategoryChart
                 key={category}

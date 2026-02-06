@@ -3,32 +3,26 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie, Doughnut, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
 import { CHART_THEME } from '../lib/chart-theme';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { CardType, Element, ELEMENT_LABELS } from '../lib/enums';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const TYPE_COLORS = {
-  Minion: '#208aae',
-  Magic: '#79b791',
-  Site: '#dd7230',
-  Aura: '#ffd131',
-  Artifact: '#0d324d',
-  Unknown: '#262d40',
+  [CardType.Minion]: '#208aae',
+  [CardType.Magic]: '#79b791',
+  [CardType.Site]: '#dd7230',
+  [CardType.Aura]: '#ffd131',
+  [CardType.Artifact]: '#0d324d',
+  [CardType.Unknown]: '#262d40',
 };
 
 const ELEMENT_COLORS = {
-  fire: '#dd7230',
-  water: '#208aae',
-  earth: '#79b791',
-  air: '#ffd131',
-  none: '#5e70a1',
-};
-
-const ELEMENT_LABELS = {
-  fire: 'Fire',
-  water: 'Water',
-  earth: 'Earth',
-  air: 'Air',
-  none: 'None',
+  [Element.Fire]: '#dd7230',
+  [Element.Water]: '#208aae',
+  [Element.Earth]: '#79b791',
+  [Element.Air]: '#ffd131',
+  [Element.None]: '#5e70a1',
 };
 
 export default function TypeChart() {
@@ -37,6 +31,7 @@ export default function TypeChart() {
   const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
   const { typeBreakdown, typeElementBreakdown } = filteredStats;
   const activeType = pageFilter.type;
+  const isMobile = useIsMobile();
 
   const handlePieClick = useCallback(
     (event) => {
@@ -80,10 +75,10 @@ export default function TypeChart() {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'right',
+          position: isMobile ? 'bottom' : 'right',
           labels: {
             color: CHART_THEME.titleColor,
-            padding: 12,
+            padding: isMobile ? 8 : 12,
             usePointStyle: true,
           },
         },
@@ -92,7 +87,7 @@ export default function TypeChart() {
           text: `${drilldownType} Elements`,
           color: CHART_THEME.titleColor,
           font: {
-            size: 16,
+            size: isMobile ? 14 : 16,
             weight: 'bold',
           },
         },
@@ -100,7 +95,7 @@ export default function TypeChart() {
     };
 
     return (
-      <div className="section-panel-sandy p-5 h-72 relative">
+      <div className="section-panel-sandy p-3 sm:p-5 h-60 md:h-72 relative">
         <button
           onClick={() => setDrilldownType(null)}
           className="absolute top-2 right-2 z-10 px-2 py-1 bg-shadow-grey-700 hover:bg-shadow-grey-600 border border-shadow-grey-600 rounded text-xs text-shadow-grey-300 transition-colors"
@@ -116,7 +111,7 @@ export default function TypeChart() {
   const labels = Object.keys(typeBreakdown);
   const dataValues = Object.values(typeBreakdown);
   const colors = labels.map((type) => {
-    const base = TYPE_COLORS[type] || TYPE_COLORS.Unknown;
+    const base = TYPE_COLORS[type] || TYPE_COLORS[CardType.Unknown];
     if (activeType === null) return base;
     return type === activeType ? base : base + '33';
   });
@@ -138,10 +133,10 @@ export default function TypeChart() {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right',
+        position: isMobile ? 'bottom' : 'right',
         labels: {
           color: CHART_THEME.titleColor,
-          padding: 12,
+          padding: isMobile ? 8 : 12,
           usePointStyle: true,
         },
       },
@@ -150,7 +145,7 @@ export default function TypeChart() {
         text: 'Card Types',
         color: CHART_THEME.titleColor,
         font: {
-          size: 16,
+          size: isMobile ? 14 : 16,
           weight: 'bold',
         },
       },
@@ -161,7 +156,7 @@ export default function TypeChart() {
   const canDrilldown = activeType && typeElementBreakdown?.[activeType];
 
   return (
-    <div className="section-panel-sandy p-5 h-72 relative [&_canvas]:!cursor-pointer">
+    <div className="section-panel-sandy p-3 sm:p-5 h-60 md:h-72 relative [&_canvas]:!cursor-pointer">
       {canDrilldown && (
         <button
           onClick={() => setDrilldownType(activeType)}

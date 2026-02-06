@@ -20,10 +20,10 @@ export default function Favorites({ favorites, onLoad, onRemove }) {
           {favorites.map((fav) => (
             <div
               key={fav.deckId}
-              className="flex items-center gap-3 px-3 py-2 bg-shadow-grey-800/60 rounded-lg border border-shadow-grey-700/50 hover:border-rosy-granite-500/30 text-sm transition-colors"
+              className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 py-2 bg-shadow-grey-800/60 rounded-lg border border-shadow-grey-700/50 hover:border-rosy-granite-500/30 text-sm transition-colors"
             >
               <span className="flex-1 text-shadow-grey-200 truncate">{fav.name}</span>
-              <span className="text-shadow-grey-500 text-xs truncate max-w-[120px]">{fav.deckId}</span>
+              <span className="text-shadow-grey-500 text-xs truncate max-w-[80px] sm:max-w-[120px]">{fav.deckId}</span>
               <button
                 onClick={() => onLoad(fav.deckId)}
                 className="px-2 py-0.5 bg-pacific-cyan-600 hover:bg-pacific-cyan-700 text-white rounded text-xs transition-colors"

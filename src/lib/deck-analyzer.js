@@ -1,6 +1,7 @@
 /**
  * Analyzes deck data and extracts statistics and synergies
  */
+import { CardType, Element } from './enums';
 
 export const KEYWORD_CATEGORIES = {
   Abilities: [
@@ -86,16 +87,16 @@ export function extractKeywords(rulesText) {
  */
 export function computeStats(cards) {
   const manaCurve = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, '7+': 0 };
-  const elementBreakdown = { fire: 0, water: 0, earth: 0, air: 0, none: 0 };
-  const maxThresholds = { fire: 0, water: 0, earth: 0, air: 0 };
+  const elementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
+  const maxThresholds = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
   const typeBreakdown = {};
   const rarityBreakdown = {};
-  const siteElementBreakdown = { fire: 0, water: 0, earth: 0, air: 0, none: 0 };
+  const siteElementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
   const typeElementBreakdown = {
-    Minion: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
-    Magic: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
-    Site: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
-    Aura: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    [CardType.Minion]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Magic]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Site]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Aura]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
   };
 
   let totalCards = 0;
@@ -119,7 +120,7 @@ export function computeStats(cards) {
     // Element breakdown
     const elements = card.elements || [];
     if (elements.length === 0) {
-      elementBreakdown.none += qty;
+      elementBreakdown[Element.None] += qty;
     } else {
       for (const el of elements) {
         const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
@@ -130,27 +131,27 @@ export function computeStats(cards) {
     }
 
     // Max thresholds
-    if (card.fireThreshold > maxThresholds.fire) {
-      maxThresholds.fire = card.fireThreshold;
+    if (card.fireThreshold > maxThresholds[Element.Fire]) {
+      maxThresholds[Element.Fire] = card.fireThreshold;
     }
-    if (card.waterThreshold > maxThresholds.water) {
-      maxThresholds.water = card.waterThreshold;
+    if (card.waterThreshold > maxThresholds[Element.Water]) {
+      maxThresholds[Element.Water] = card.waterThreshold;
     }
-    if (card.earthThreshold > maxThresholds.earth) {
-      maxThresholds.earth = card.earthThreshold;
+    if (card.earthThreshold > maxThresholds[Element.Earth]) {
+      maxThresholds[Element.Earth] = card.earthThreshold;
     }
-    if (card.airThreshold > maxThresholds.air) {
-      maxThresholds.air = card.airThreshold;
+    if (card.airThreshold > maxThresholds[Element.Air]) {
+      maxThresholds[Element.Air] = card.airThreshold;
     }
 
     // Type breakdown
-    const type = card.type || 'Unknown';
+    const type = card.type || CardType.Unknown;
     typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
 
     // Site element breakdown
-    if (type === 'Site') {
+    if (type === CardType.Site) {
       if (elements.length === 0) {
-        siteElementBreakdown.none += qty;
+        siteElementBreakdown[Element.None] += qty;
       } else {
         for (const el of elements) {
           const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
@@ -164,7 +165,7 @@ export function computeStats(cards) {
     // Type-element breakdown
     if (typeElementBreakdown[type]) {
       if (elements.length === 0) {
-        typeElementBreakdown[type].none += qty;
+        typeElementBreakdown[type][Element.None] += qty;
       } else {
         for (const el of elements) {
           const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
@@ -176,7 +177,7 @@ export function computeStats(cards) {
     }
 
     // Rarity breakdown
-    const rarity = card.rarity || 'Unknown';
+    const rarity = card.rarity || CardType.Unknown;
     rarityBreakdown[rarity] = (rarityBreakdown[rarity] || 0) + qty;
   }
 
@@ -239,6 +240,7 @@ export function formatCard(item) {
 
   // Get image URL from first variant if available
   const imageUrl = card.variants?.[0]?.src ?? null;
+  const isRotated = card.type === CardType.Site;
 
   return {
     name: card.name,
@@ -252,6 +254,7 @@ export function formatCard(item) {
     quantity: item.quantity,
     keywords,
     imageUrl,
+    isRotated,
     fireThreshold: card.fireThreshold || 0,
     waterThreshold: card.waterThreshold || 0,
     earthThreshold: card.earthThreshold || 0,
@@ -287,16 +290,16 @@ export function formatAvatar(avatar) {
  */
 export function computeStatsFromFormattedCards(cards) {
   const manaCurve = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, '7+': 0 };
-  const elementBreakdown = { fire: 0, water: 0, earth: 0, air: 0, none: 0 };
-  const maxThresholds = { fire: 0, water: 0, earth: 0, air: 0 };
+  const elementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
+  const maxThresholds = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
   const typeBreakdown = {};
   const rarityBreakdown = {};
-  const siteElementBreakdown = { fire: 0, water: 0, earth: 0, air: 0, none: 0 };
+  const siteElementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
   const typeElementBreakdown = {
-    Minion: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
-    Magic: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
-    Site: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
-    Aura: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    [CardType.Minion]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Magic]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Site]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Aura]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
   };
 
   let totalCards = 0;
@@ -317,7 +320,7 @@ export function computeStatsFromFormattedCards(cards) {
 
     const elements = card.elements || [];
     if (elements.length === 0) {
-      elementBreakdown.none += qty;
+      elementBreakdown[Element.None] += qty;
     } else {
       for (const el of elements) {
         const elKey = el.toLowerCase();
@@ -327,17 +330,17 @@ export function computeStatsFromFormattedCards(cards) {
       }
     }
 
-    if ((card.fireThreshold || 0) > maxThresholds.fire) maxThresholds.fire = card.fireThreshold;
-    if ((card.waterThreshold || 0) > maxThresholds.water) maxThresholds.water = card.waterThreshold;
-    if ((card.earthThreshold || 0) > maxThresholds.earth) maxThresholds.earth = card.earthThreshold;
-    if ((card.airThreshold || 0) > maxThresholds.air) maxThresholds.air = card.airThreshold;
+    if ((card.fireThreshold || 0) > maxThresholds[Element.Fire]) maxThresholds[Element.Fire] = card.fireThreshold;
+    if ((card.waterThreshold || 0) > maxThresholds[Element.Water]) maxThresholds[Element.Water] = card.waterThreshold;
+    if ((card.earthThreshold || 0) > maxThresholds[Element.Earth]) maxThresholds[Element.Earth] = card.earthThreshold;
+    if ((card.airThreshold || 0) > maxThresholds[Element.Air]) maxThresholds[Element.Air] = card.airThreshold;
 
-    const type = card.type || 'Unknown';
+    const type = card.type || CardType.Unknown;
     typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
 
-    if (type === 'Site') {
+    if (type === CardType.Site) {
       if (elements.length === 0) {
-        siteElementBreakdown.none += qty;
+        siteElementBreakdown[Element.None] += qty;
       } else {
         for (const el of elements) {
           const elKey = el.toLowerCase();
@@ -350,7 +353,7 @@ export function computeStatsFromFormattedCards(cards) {
 
     if (typeElementBreakdown[type]) {
       if (elements.length === 0) {
-        typeElementBreakdown[type].none += qty;
+        typeElementBreakdown[type][Element.None] += qty;
       } else {
         for (const el of elements) {
           const elKey = el.toLowerCase();
@@ -361,7 +364,7 @@ export function computeStatsFromFormattedCards(cards) {
       }
     }
 
-    const rarity = card.rarity || 'Unknown';
+    const rarity = card.rarity || CardType.Unknown;
     rarityBreakdown[rarity] = (rarityBreakdown[rarity] || 0) + qty;
   }
 

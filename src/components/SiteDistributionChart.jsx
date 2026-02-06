@@ -11,6 +11,7 @@ import {
 import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
 import { CHART_THEME } from '../lib/chart-theme';
+import { Element, ELEMENT_LABELS } from '../lib/enums';
 
 ChartJS.register(
   CategoryScale,
@@ -18,21 +19,14 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 const ELEMENT_COLORS = {
-  fire: '#dd7230',
-  water: '#208aae',
-  earth: '#79b791',
-  air: '#ffd131',
-};
-
-const ELEMENT_LABELS = {
-  fire: 'Fire',
-  water: 'Water',
-  earth: 'Earth',
-  air: 'Air',
+  [Element.Fire]: '#dd7230',
+  [Element.Water]: '#208aae',
+  [Element.Earth]: '#79b791',
+  [Element.Air]: '#ffd131',
 };
 
 const options = {
@@ -82,11 +76,11 @@ export default function SiteDistributionChart() {
   const { siteElementBreakdown, maxThresholds } = filteredStats;
   const activeElement = pageFilter.element;
 
-  const elements = ['fire', 'water', 'earth', 'air'];
+  const elements = [Element.Fire, Element.Water, Element.Earth, Element.Air];
 
   // Only show elements that have either sites or a threshold > 0
   const active = elements.filter(
-    (el) => siteElementBreakdown[el] > 0 || maxThresholds[el] > 0
+    (el) => siteElementBreakdown[el] > 0 || maxThresholds[el] > 0,
   );
 
   const labels = active.map((el) => ELEMENT_LABELS[el]);
@@ -118,7 +112,7 @@ export default function SiteDistributionChart() {
     labels,
     datasets: [
       {
-        label: 'Sites Owned',
+        label: 'Sites',
         data: siteData,
         backgroundColor: colors,
         borderColor: colors,
@@ -128,7 +122,9 @@ export default function SiteDistributionChart() {
       {
         label: 'Max Threshold',
         data: thresholdData,
-        backgroundColor: colors.map((c) => c.length <= 7 ? c + '55' : c.slice(0, 7) + '55'),
+        backgroundColor: colors.map((c) =>
+          c.length <= 7 ? c + '55' : c.slice(0, 7) + '55',
+        ),
         borderColor: colors,
         borderWidth: 2,
         borderDash: [4, 4],
@@ -138,7 +134,7 @@ export default function SiteDistributionChart() {
   };
 
   return (
-    <div className="section-panel-mint p-5 h-72 [&_canvas]:!cursor-pointer">
+    <div className="section-panel-mint p-3 sm:p-5 h-56 md:h-72 [&_canvas]:!cursor-pointer">
       <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );

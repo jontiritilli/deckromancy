@@ -102,7 +102,7 @@ export default function ManaCurveChart() {
   );
 
   return (
-    <div className="section-panel-cyan p-5 h-80 [&_canvas]:!cursor-pointer">
+    <div className="section-panel-cyan p-3 sm:p-5 h-56 md:h-80 [&_canvas]:!cursor-pointer">
       <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );

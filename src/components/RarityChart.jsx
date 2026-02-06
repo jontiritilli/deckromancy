@@ -11,6 +11,7 @@ import {
 import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
 import { CHART_THEME } from '../lib/chart-theme';
+import { Rarity, RARITY_ORDER } from '../lib/enums';
 
 ChartJS.register(
   CategoryScale,
@@ -22,13 +23,11 @@ ChartJS.register(
 );
 
 const RARITY_COLORS = {
-  Ordinary: '#7e8db4',
-  Exceptional: '#79b791',
-  Elite: '#208aae',
-  Unique: '#ffd131',
+  [Rarity.Ordinary]: '#7e8db4',
+  [Rarity.Exceptional]: '#79b791',
+  [Rarity.Elite]: '#208aae',
+  [Rarity.Unique]: '#ffd131',
 };
-
-const RARITY_ORDER = ['Ordinary', 'Exceptional', 'Elite', 'Unique'];
 
 const options = {
   indexAxis: 'y',
@@ -110,7 +109,7 @@ export default function RarityChart() {
   );
 
   return (
-    <div className="section-panel-rosy p-5 h-72 [&_canvas]:!cursor-pointer">
+    <div className="section-panel-rosy p-3 sm:p-5 h-56 md:h-72 [&_canvas]:!cursor-pointer">
       <Bar ref={chartRef} options={options} data={data} onClick={handleClick} />
     </div>
   );
