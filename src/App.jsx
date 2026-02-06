@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 import { useDeck } from './hooks/useDeck';
 import { useFavorites } from './hooks/useFavorites';
 import DeckInput from './components/DeckInput';
@@ -7,9 +7,9 @@ import DeckHeader from './components/DeckHeader';
 import Favorites from './components/Favorites';
 import StatsOverview from './components/StatsOverview';
 import ManaCurveChart from './components/ManaCurveChart';
-import ElementChart from './components/ElementChart';
 import TypeChart from './components/TypeChart';
 import RarityChart from './components/RarityChart';
+import SiteDistributionChart from './components/SiteDistributionChart';
 import SynergyTags from './components/SynergyTags';
 import CardList from './components/CardList';
 
@@ -102,9 +102,15 @@ function App() {
             {/* Charts Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ManaCurveChart manaCurve={deck.stats.manaCurve} />
-              <ElementChart elementBreakdown={deck.stats.elementBreakdown} />
-              <TypeChart typeBreakdown={deck.stats.typeBreakdown} />
+              <TypeChart
+                typeBreakdown={deck.stats.typeBreakdown}
+                typeElementBreakdown={deck.stats.typeElementBreakdown}
+              />
               <RarityChart rarityBreakdown={deck.stats.rarityBreakdown} />
+              <SiteDistributionChart
+                siteElementBreakdown={deck.stats.siteElementBreakdown}
+                maxThresholds={deck.stats.maxThresholds}
+              />
             </div>
 
             {/* Synergies */}
@@ -112,6 +118,11 @@ function App() {
 
             {/* Card List */}
             <CardList cards={deck.cards} />
+
+            {/* Collection (Sideboard) */}
+            {deck.sideboard.length > 0 && (
+              <CardList title="Collection" cards={deck.sideboard} />
+            )}
           </div>
         )}
       </div>

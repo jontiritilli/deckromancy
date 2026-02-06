@@ -24,7 +24,7 @@ const RARITY_COLORS = {
 
 const RARITY_ORDER = ['Ordinary', 'Exceptional', 'Elite', 'Unique'];
 
-export default function CardList({ cards }) {
+export default function CardList({ cards, title = 'Cards' }) {
   const [filter, setFilter] = useState({ type: '', element: '', rarity: '' });
   const [sortBy, setSortBy] = useState('name');
   const [sortDir, setSortDir] = useState('asc');
@@ -142,7 +142,7 @@ export default function CardList({ cards }) {
     <div className="bg-gray-800 rounded-lg p-4">
       <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
         <h3 className="text-lg font-bold text-gray-100">
-          Cards ({filteredCards.length})
+          {title} ({filteredCards.reduce((sum, c) => sum + c.quantity, 0)} cards, {filteredCards.length} unique)
         </h3>
 
         {/* Filters + Copy */}

@@ -65,6 +65,13 @@ export function computeStats(cards) {
   const maxThresholds = { fire: 0, water: 0, earth: 0, air: 0 };
   const typeBreakdown = {};
   const rarityBreakdown = {};
+  const siteElementBreakdown = { fire: 0, water: 0, earth: 0, air: 0, none: 0 };
+  const typeElementBreakdown = {
+    Minion: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    Magic: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    Site: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+    Aura: { fire: 0, water: 0, earth: 0, air: 0, none: 0 },
+  };
 
   let totalCards = 0;
   let totalCost = 0;
@@ -115,6 +122,34 @@ export function computeStats(cards) {
     const type = card.type || 'Unknown';
     typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
 
+    // Site element breakdown
+    if (type === 'Site') {
+      if (elements.length === 0) {
+        siteElementBreakdown.none += qty;
+      } else {
+        for (const el of elements) {
+          const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
+          if (elName && Object.prototype.hasOwnProperty.call(siteElementBreakdown, elName)) {
+            siteElementBreakdown[elName] += qty;
+          }
+        }
+      }
+    }
+
+    // Type-element breakdown
+    if (typeElementBreakdown[type]) {
+      if (elements.length === 0) {
+        typeElementBreakdown[type].none += qty;
+      } else {
+        for (const el of elements) {
+          const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
+          if (elName && Object.prototype.hasOwnProperty.call(typeElementBreakdown[type], elName)) {
+            typeElementBreakdown[type][elName] += qty;
+          }
+        }
+      }
+    }
+
     // Rarity breakdown
     const rarity = card.rarity || 'Unknown';
     rarityBreakdown[rarity] = (rarityBreakdown[rarity] || 0) + qty;
@@ -130,6 +165,8 @@ export function computeStats(cards) {
     maxThresholds,
     typeBreakdown,
     rarityBreakdown,
+    siteElementBreakdown,
+    typeElementBreakdown,
   };
 }
 

@@ -1,0 +1,119 @@
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const ELEMENT_COLORS = {
+  fire: '#ef4444',
+  water: '#3b82f6',
+  earth: '#22c55e',
+  air: '#eab308',
+};
+
+const ELEMENT_LABELS = {
+  fire: 'Fire',
+  water: 'Water',
+  earth: 'Earth',
+  air: 'Air',
+};
+
+const options = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: {
+        color: '#e5e7eb',
+      },
+    },
+    title: {
+      display: true,
+      text: 'Site Distribution vs Thresholds',
+      color: '#e5e7eb',
+      font: {
+        size: 16,
+        weight: 'bold',
+      },
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        color: '#9ca3af',
+        stepSize: 1,
+      },
+      grid: {
+        color: '#374151',
+      },
+    },
+    x: {
+      ticks: {
+        color: '#9ca3af',
+      },
+      grid: {
+        display: false,
+      },
+    },
+  },
+};
+
+export default function SiteDistributionChart({ siteElementBreakdown, maxThresholds }) {
+  const elements = ['fire', 'water', 'earth', 'air'];
+
+  // Only show elements that have either sites or a threshold > 0
+  const active = elements.filter(
+    (el) => siteElementBreakdown[el] > 0 || maxThresholds[el] > 0
+  );
+
+  if (active.length === 0) return null;
+
+  const labels = active.map((el) => ELEMENT_LABELS[el]);
+  const siteData = active.map((el) => siteElementBreakdown[el]);
+  const thresholdData = active.map((el) => maxThresholds[el]);
+  const colors = active.map((el) => ELEMENT_COLORS[el]);
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'Sites Owned',
+        data: siteData,
+        backgroundColor: colors,
+        borderColor: colors.map((c) => c),
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'Max Threshold',
+        data: thresholdData,
+        backgroundColor: colors.map((c) => c + '55'),
+        borderColor: colors,
+        borderWidth: 2,
+        borderDash: [4, 4],
+        borderRadius: 4,
+      },
+    ],
+  };
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4 h-64">
+      <Bar options={options} data={data} />
+    </div>
+  );
+}
