@@ -15,15 +15,15 @@ const TYPE_COLORS = {
   [CardType.Minion]: 'bg-[#208aae]/20 text-[#208aae]',
   [CardType.Magic]: 'bg-[#79b791]/20 text-[#79b791]',
   [CardType.Site]: 'bg-[#dd7230]/20 text-[#dd7230]',
-  [CardType.Aura]: 'bg-[#ffd131]/20 text-[#ffd131]',
-  [CardType.Artifact]: 'bg-shadow-grey-700 text-shadow-grey-300',
+  [CardType.Aura]: 'bg-[#ffd131]/20 text-[#b89400]',
+  [CardType.Artifact]: 'bg-shadow-grey-200 text-shadow-grey-600',
 };
 
 const RARITY_COLORS = {
-  [Rarity.Ordinary]: 'bg-shadow-grey-600/30 text-shadow-grey-300',
+  [Rarity.Ordinary]: 'bg-shadow-grey-200/60 text-shadow-grey-600',
   [Rarity.Exceptional]: 'bg-[#79b791]/20 text-[#79b791]',
   [Rarity.Elite]: 'bg-[#208aae]/20 text-[#208aae]',
-  [Rarity.Unique]: 'bg-[#ffd131]/20 text-[#ffd131]',
+  [Rarity.Unique]: 'bg-[#ffd131]/20 text-[#b89400]',
 };
 
 export default function CardList({ cards, title = 'Cards' }) {
@@ -63,29 +63,32 @@ export default function CardList({ cards, title = 'Cards' }) {
     let result = cards;
 
     // Page-level filters (from chart clicks)
-    if (pageFilter.cost !== null) {
+    if (pageFilter.cost.length > 0) {
       result = result.filter((c) => {
         if (c.cost === null) return false;
-        if (pageFilter.cost === '7+') return c.cost >= 7;
-        return c.cost === Number(pageFilter.cost);
+        return pageFilter.cost.some((v) =>
+          v === '7+' ? c.cost >= 7 : c.cost === Number(v),
+        );
       });
     }
 
-    if (pageFilter.type) {
-      result = result.filter((c) => c.type === pageFilter.type);
+    if (pageFilter.type.length > 0) {
+      result = result.filter((c) => pageFilter.type.includes(c.type));
     }
 
-    if (pageFilter.rarity) {
-      result = result.filter((c) => c.rarity === pageFilter.rarity);
+    if (pageFilter.rarity.length > 0) {
+      result = result.filter((c) => pageFilter.rarity.includes(c.rarity));
     }
 
-    if (pageFilter.element) {
-      result = result.filter((c) => c.elements.includes(pageFilter.element));
-    }
-
-    if (pageFilter.keyword) {
+    if (pageFilter.element.length > 0) {
       result = result.filter((c) =>
-        (c.keywords || []).includes(pageFilter.keyword),
+        c.elements.some((el) => pageFilter.element.includes(el)),
+      );
+    }
+
+    if (pageFilter.keyword.length > 0) {
+      result = result.filter((c) =>
+        (c.keywords || []).some((kw) => pageFilter.keyword.includes(kw)),
       );
     }
 
@@ -175,12 +178,12 @@ export default function CardList({ cards, title = 'Cards' }) {
       : null;
 
   return (
-    <div className="section-panel overflow-hidden border-t-4 border-t-rosy-granite-500/60 p-0">
-      <div className="px-3 sm:px-5 py-3 sm:py-4 bg-shadow-grey-900/40">
+    <div className="section-panel overflow-hidden border-t-4 border-t-rosy-granite-400/60 p-0">
+      <div className="px-3 sm:px-5 py-3 sm:py-4 bg-rosy-granite-50/40">
         <div className="flex flex-wrap justify-between items-center gap-3">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center gap-2 text-lg font-bold text-shadow-grey-100 hover:text-shadow-grey-300 transition-colors"
+            className="flex items-center gap-2 text-lg font-bold text-shadow-grey-800 hover:text-shadow-grey-600 transition-colors"
           >
             <span
               className={`text-sm transition-transform ${
@@ -199,7 +202,7 @@ export default function CardList({ cards, title = 'Cards' }) {
               <select
                 value={filter.type}
                 onChange={(e) => setFilter({ ...filter, type: e.target.value })}
-                className="w-full sm:w-auto min-h-[44px] py-2 px-3 bg-shadow-grey-700 border border-shadow-grey-600 border-l-2 border-l-sandy-brown-500/50 rounded text-sm text-shadow-grey-200"
+                className="w-full sm:w-auto min-h-[44px] py-2 px-3 bg-white border border-shadow-grey-300 border-l-2 border-l-sandy-brown-400 rounded text-sm text-shadow-grey-700"
               >
                 <option value="">All Types</option>
                 {types.map((t) => (
@@ -214,7 +217,7 @@ export default function CardList({ cards, title = 'Cards' }) {
                 onChange={(e) =>
                   setFilter({ ...filter, element: e.target.value })
                 }
-                className="w-full sm:w-auto min-h-[44px] py-2 px-3 bg-shadow-grey-700 border border-shadow-grey-600 border-l-2 border-l-mint-cream-400/50 rounded text-sm text-shadow-grey-200"
+                className="w-full sm:w-auto min-h-[44px] py-2 px-3 bg-white border border-shadow-grey-300 border-l-2 border-l-mint-cream-400 rounded text-sm text-shadow-grey-700"
               >
                 <option value="">All Elements</option>
                 {elements.map((e) => (
@@ -229,7 +232,7 @@ export default function CardList({ cards, title = 'Cards' }) {
                 onChange={(e) =>
                   setFilter({ ...filter, rarity: e.target.value })
                 }
-                className="w-full sm:w-auto min-h-[44px] py-2 px-3 bg-shadow-grey-700 border border-shadow-grey-600 border-l-2 border-l-rosy-granite-400/50 rounded text-sm text-shadow-grey-200"
+                className="w-full sm:w-auto min-h-[44px] py-2 px-3 bg-white border border-shadow-grey-300 border-l-2 border-l-rosy-granite-400 rounded text-sm text-shadow-grey-700"
               >
                 <option value="">All Rarities</option>
                 {rarities.map((r) => (
@@ -245,13 +248,13 @@ export default function CardList({ cards, title = 'Cards' }) {
         {/* Mobile view toggle + sort */}
         {!collapsed && isMobile && (
           <div className="flex items-center gap-2 mt-3">
-            <div className="flex rounded overflow-hidden border border-shadow-grey-600">
+            <div className="flex rounded overflow-hidden border border-shadow-grey-300">
               <button
                 onClick={() => setViewMode('tiles')}
                 className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                   viewMode === 'tiles'
-                    ? 'bg-pacific-cyan-600 text-white'
-                    : 'bg-shadow-grey-700 text-shadow-grey-300'
+                    ? 'bg-pacific-cyan-500 text-white'
+                    : 'bg-white text-shadow-grey-600'
                 }`}
               >
                 Cards
@@ -260,8 +263,8 @@ export default function CardList({ cards, title = 'Cards' }) {
                 onClick={() => setViewMode('table')}
                 className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                   viewMode === 'table'
-                    ? 'bg-pacific-cyan-600 text-white'
-                    : 'bg-shadow-grey-700 text-shadow-grey-300'
+                    ? 'bg-pacific-cyan-500 text-white'
+                    : 'bg-white text-shadow-grey-600'
                 }`}
               >
                 Table
@@ -271,7 +274,7 @@ export default function CardList({ cards, title = 'Cards' }) {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="flex-1 min-h-[36px] px-2 py-1 bg-shadow-grey-700 border border-shadow-grey-600 rounded text-xs text-shadow-grey-200"
+                className="flex-1 min-h-[36px] px-2 py-1 bg-white border border-shadow-grey-300 rounded text-xs text-shadow-grey-700"
               >
                 <option value="name">Name A-Z</option>
                 <option value="cost">Cost</option>
@@ -292,7 +295,7 @@ export default function CardList({ cards, title = 'Cards' }) {
               {filteredCards.map((card, idx) => (
                 <div
                   key={`${card.name}-${idx}`}
-                  className="bg-shadow-grey-900/50 rounded-lg overflow-hidden border border-shadow-grey-700/50 active:border-pacific-cyan-500/50 transition-colors"
+                  className="bg-white/60 rounded-lg overflow-hidden border border-shadow-grey-200 active:border-pacific-cyan-400 transition-colors"
                   onClick={() => setPreviewCard(card)}
                 >
                   {card.imageUrl ? (
@@ -311,24 +314,24 @@ export default function CardList({ cards, title = 'Cards' }) {
                       />
                     </div>
                   ) : (
-                    <div className="aspect-[5/7] bg-shadow-grey-700 flex items-center justify-center text-shadow-grey-500 text-xs">
+                    <div className="aspect-[5/7] bg-shadow-grey-100 flex items-center justify-center text-shadow-grey-400 text-xs">
                       No Image
                     </div>
                   )}
                   <div className="p-2">
-                    <div className="text-xs font-medium text-shadow-grey-200 truncate">
+                    <div className="text-xs font-medium text-shadow-grey-700 truncate">
                       {card.name}
                     </div>
                     <div className="flex items-center justify-between mt-1">
                       <span
                         className={`px-1.5 py-0.5 rounded text-[10px] ${
                           TYPE_COLORS[card.type] ||
-                          'bg-shadow-grey-700 text-shadow-grey-300'
+                          'bg-shadow-grey-200 text-shadow-grey-600'
                         }`}
                       >
                         {card.type}
                       </span>
-                      <span className="text-[10px] text-shadow-grey-400">
+                      <span className="text-[10px] text-shadow-grey-500">
                         x{card.quantity}
                       </span>
                     </div>
@@ -341,35 +344,35 @@ export default function CardList({ cards, title = 'Cards' }) {
             <div className="overflow-x-auto px-3 sm:px-5 pb-4">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-shadow-grey-300 border-b-2 border-shadow-grey-600">
+                  <tr className="text-left text-shadow-grey-600 border-b-2 border-shadow-grey-200">
                     <th className="pb-2 pr-4">Image</th>
                     <th
-                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
+                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-800"
                       onClick={() => handleSort('name')}
                     >
                       Name <SortIcon column="name" />
                     </th>
                     <th
-                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
+                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-800"
                       onClick={() => handleSort('type')}
                     >
                       Type <SortIcon column="type" />
                     </th>
                     <th
-                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
+                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-800"
                       onClick={() => handleSort('cost')}
                     >
                       Cost <SortIcon column="cost" />
                     </th>
                     <th
-                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-200"
+                      className="pb-2 pr-4 cursor-pointer hover:text-shadow-grey-800"
                       onClick={() => handleSort('rarity')}
                     >
                       Rarity <SortIcon column="rarity" />
                     </th>
                     <th className="pb-2 pr-4">Elements</th>
                     <th
-                      className="pb-2 cursor-pointer hover:text-shadow-grey-200"
+                      className="pb-2 cursor-pointer hover:text-shadow-grey-800"
                       onClick={() => handleSort('quantity')}
                     >
                       Qty <SortIcon column="quantity" />
@@ -380,7 +383,7 @@ export default function CardList({ cards, title = 'Cards' }) {
                   {filteredCards.map((card, idx) => (
                     <tr
                       key={`${card.name}-${idx}`}
-                      className="border-b border-shadow-grey-700/50 hover:bg-rosy-granite-900/20 even:bg-shadow-grey-900/30 cursor-pointer"
+                      className="border-b border-shadow-grey-200/50 hover:bg-rosy-granite-50/30 even:bg-shadow-grey-50/40 cursor-pointer"
                       onClick={() => setPreviewCard(card)}
                     >
                       <td className="py-2 pr-4 flex items-center justify-center">
@@ -408,32 +411,32 @@ export default function CardList({ cards, title = 'Cards' }) {
                             />
                           </div>
                         ) : (
-                          <div className="w-12 h-16 bg-shadow-grey-700 rounded flex items-center justify-center text-xs text-shadow-grey-500">
+                          <div className="w-12 h-16 bg-shadow-grey-100 rounded flex items-center justify-center text-xs text-shadow-grey-400">
                             ?
                           </div>
                         )}
                       </td>
-                      <td className="py-2 pr-4 font-medium text-shadow-grey-200">
+                      <td className="py-2 pr-4 font-medium text-shadow-grey-700">
                         {card.name}
                       </td>
                       <td className="py-2 pr-4">
                         <span
                           className={`px-2 py-0.5 rounded text-xs ${
                             TYPE_COLORS[card.type] ||
-                            'bg-shadow-grey-700 text-shadow-grey-300'
+                            'bg-shadow-grey-200 text-shadow-grey-600'
                           }`}
                         >
                           {card.type}
                         </span>
                       </td>
-                      <td className="py-2 pr-4 text-shadow-grey-300">
+                      <td className="py-2 pr-4 text-shadow-grey-600">
                         {card.cost !== null ? card.cost : '-'}
                       </td>
                       <td className="py-2 pr-4">
                         <span
                           className={`px-2 py-0.5 rounded text-xs ${
                             RARITY_COLORS[card.rarity] ||
-                            'bg-shadow-grey-700 text-shadow-grey-300'
+                            'bg-shadow-grey-200 text-shadow-grey-600'
                           }`}
                         >
                           {card.rarity || '-'}
@@ -444,21 +447,21 @@ export default function CardList({ cards, title = 'Cards' }) {
                           {card.elements.map((el) => (
                             <span
                               key={el}
-                              className={`text-xs ${
-                                ELEMENT_COLORS[el] || 'text-shadow-grey-400'
+                              className={`text-xs font-medium ${
+                                ELEMENT_COLORS[el] || 'text-shadow-grey-500'
                               }`}
                             >
                               {el}
                             </span>
                           ))}
                           {card.elements.length === 0 && (
-                            <span className="text-xs text-shadow-grey-500">
+                            <span className="text-xs text-shadow-grey-400">
                               -
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="py-2 text-shadow-grey-300 font-medium">
+                      <td className="py-2 text-shadow-grey-600 font-medium">
                         x{card.quantity}
                       </td>
                     </tr>
@@ -480,7 +483,7 @@ export default function CardList({ cards, title = 'Cards' }) {
             <img
               src={hover.imageUrl}
               alt="Card preview"
-              className={`w-full h-full object-cover rounded-lg shadow-2xl border border-pacific-cyan-600/30 shadow-pacific-cyan-900/30 ${
+              className={`w-full h-full object-cover rounded-lg shadow-2xl border border-sandy-brown-300/40 shadow-sandy-brown-200/30 ${
                 hover.isRotated ? 'rotate-90' : ''
               }`}
             />
@@ -492,16 +495,16 @@ export default function CardList({ cards, title = 'Cards' }) {
       {previewCard &&
         createPortal(
           <div
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={() => setPreviewCard(null)}
           >
             <div
-              className="relative bg-shadow-grey-800 border border-shadow-grey-600 rounded-xl shadow-2xl max-h-[90vh] max-w-2xl w-full overflow-y-auto"
+              className="relative bg-white border border-shadow-grey-200 rounded-xl shadow-2xl max-h-[90vh] max-w-2xl w-full overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setPreviewCard(null)}
-                className="absolute top-2 right-2 z-10 w-8 h-8 bg-shadow-grey-700 hover:bg-shadow-grey-600 border border-shadow-grey-500 rounded-full flex items-center justify-center text-shadow-grey-200 text-lg leading-none transition-colors"
+                className="absolute top-2 right-2 z-10 w-8 h-8 bg-shadow-grey-100 hover:bg-shadow-grey-200 border border-shadow-grey-300 rounded-full flex items-center justify-center text-shadow-grey-600 text-lg leading-none transition-colors"
               >
                 &times;
               </button>
@@ -521,10 +524,10 @@ export default function CardList({ cards, title = 'Cards' }) {
                   )}
                   <div className="flex-1 min-w-0 space-y-2 pt-1">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-lg font-bold text-shadow-grey-50 leading-tight">
+                      <h3 className="text-lg font-bold text-shadow-grey-900 leading-tight">
                         {previewCard.name}
                       </h3>
-                      <span className="text-sm text-shadow-grey-400 shrink-0">
+                      <span className="text-sm text-shadow-grey-500 shrink-0">
                         x{previewCard.quantity}
                       </span>
                     </div>
@@ -533,13 +536,13 @@ export default function CardList({ cards, title = 'Cards' }) {
                       <span
                         className={`px-2 py-0.5 rounded text-xs ${
                           TYPE_COLORS[previewCard.type] ||
-                          'bg-shadow-grey-700 text-shadow-grey-300'
+                          'bg-shadow-grey-200 text-shadow-grey-600'
                         }`}
                       >
                         {previewCard.type}
                       </span>
                       {previewCard.cost !== null && (
-                        <span className="px-2 py-0.5 rounded text-xs bg-pacific-cyan-900/40 text-pacific-cyan-200">
+                        <span className="px-2 py-0.5 rounded text-xs bg-pacific-cyan-100 text-pacific-cyan-700">
                           Cost {previewCard.cost}
                         </span>
                       )}
@@ -547,7 +550,7 @@ export default function CardList({ cards, title = 'Cards' }) {
                         <span
                           className={`px-2 py-0.5 rounded text-xs ${
                             RARITY_COLORS[previewCard.rarity] ||
-                            'bg-shadow-grey-700 text-shadow-grey-300'
+                            'bg-shadow-grey-200 text-shadow-grey-600'
                           }`}
                         >
                           {previewCard.rarity}
@@ -561,7 +564,7 @@ export default function CardList({ cards, title = 'Cards' }) {
                           <span
                             key={el}
                             className={`text-sm font-medium ${
-                              ELEMENT_COLORS[el] || 'text-shadow-grey-400'
+                              ELEMENT_COLORS[el] || 'text-shadow-grey-500'
                             }`}
                           >
                             {el}
@@ -591,7 +594,7 @@ export default function CardList({ cards, title = 'Cards' }) {
                           </span>
                         )}
                         {previewCard.airThreshold > 0 && (
-                          <span className="px-2 py-0.5 rounded bg-[#ffd131]/15 text-[#ffd131]">
+                          <span className="px-2 py-0.5 rounded bg-[#ffd131]/15 text-[#b89400]">
                             Air {previewCard.airThreshold}
                           </span>
                         )}
@@ -602,18 +605,18 @@ export default function CardList({ cards, title = 'Cards' }) {
 
                 {/* Rules text */}
                 {previewCard.rulesText && (
-                  <p className="text-sm text-shadow-grey-300 leading-relaxed whitespace-pre-line border-t border-shadow-grey-700 pt-3 mt-3">
+                  <p className="text-sm text-shadow-grey-600 leading-relaxed whitespace-pre-line border-t border-shadow-grey-200 pt-3 mt-3">
                     {previewCard.rulesText}
                   </p>
                 )}
 
                 {/* Keywords */}
                 {previewCard.keywords?.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 border-t border-shadow-grey-700 pt-3 mt-3">
+                  <div className="flex flex-wrap gap-1.5 border-t border-shadow-grey-200 pt-3 mt-3">
                     {previewCard.keywords.map((kw) => (
                       <span
                         key={kw}
-                        className="px-2 py-0.5 rounded-full text-xs bg-rosy-granite-900/50 border border-rosy-granite-500/30 text-rosy-granite-200"
+                        className="px-2 py-0.5 rounded-full text-xs bg-rosy-granite-100 border border-rosy-granite-300 text-rosy-granite-700"
                       >
                         {kw}
                       </span>

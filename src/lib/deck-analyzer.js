@@ -89,6 +89,7 @@ export function computeStats(cards) {
   const manaCurve = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, '7+': 0 };
   const elementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
   const maxThresholds = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
+  const thresholdPipSums = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
   const typeBreakdown = {};
   const rarityBreakdown = {};
   const siteElementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
@@ -146,6 +147,14 @@ export function computeStats(cards) {
 
     // Type breakdown
     const type = card.type || CardType.Unknown;
+
+    // Threshold pip sums (Sites only — these represent sources, not requirements)
+    if (type === CardType.Site) {
+      if (card.fireThreshold) thresholdPipSums[Element.Fire] += card.fireThreshold * qty;
+      if (card.waterThreshold) thresholdPipSums[Element.Water] += card.waterThreshold * qty;
+      if (card.earthThreshold) thresholdPipSums[Element.Earth] += card.earthThreshold * qty;
+      if (card.airThreshold) thresholdPipSums[Element.Air] += card.airThreshold * qty;
+    }
     typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
 
     // Site element breakdown
@@ -189,6 +198,7 @@ export function computeStats(cards) {
     manaCurve,
     elementBreakdown,
     maxThresholds,
+    thresholdPipSums,
     typeBreakdown,
     rarityBreakdown,
     siteElementBreakdown,
@@ -292,6 +302,7 @@ export function computeStatsFromFormattedCards(cards) {
   const manaCurve = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, '7+': 0 };
   const elementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
   const maxThresholds = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
+  const thresholdPipSums = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
   const typeBreakdown = {};
   const rarityBreakdown = {};
   const siteElementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
@@ -336,6 +347,14 @@ export function computeStatsFromFormattedCards(cards) {
     if ((card.airThreshold || 0) > maxThresholds[Element.Air]) maxThresholds[Element.Air] = card.airThreshold;
 
     const type = card.type || CardType.Unknown;
+
+    // Threshold pip sums (Sites only — these represent sources, not requirements)
+    if (type === CardType.Site) {
+      if (card.fireThreshold) thresholdPipSums[Element.Fire] += card.fireThreshold * qty;
+      if (card.waterThreshold) thresholdPipSums[Element.Water] += card.waterThreshold * qty;
+      if (card.earthThreshold) thresholdPipSums[Element.Earth] += card.earthThreshold * qty;
+      if (card.airThreshold) thresholdPipSums[Element.Air] += card.airThreshold * qty;
+    }
     typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
 
     if (type === CardType.Site) {
@@ -385,6 +404,7 @@ export function computeStatsFromFormattedCards(cards) {
     manaCurve,
     elementBreakdown,
     maxThresholds,
+    thresholdPipSums,
     typeBreakdown,
     rarityBreakdown,
     siteElementBreakdown,

@@ -1,12 +1,21 @@
 import { useState, useRef, useCallback } from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Pie, Doughnut, getElementAtEvent } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar, Doughnut, getElementAtEvent } from 'react-chartjs-2';
 import { useDeckFilter } from '../context/DeckFilterContext';
 import { CHART_THEME } from '../lib/chart-theme';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { CardType, Element, ELEMENT_LABELS } from '../lib/enums';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const TYPE_COLORS = {
   [CardType.Minion]: '#208aae',
@@ -16,6 +25,8 @@ const TYPE_COLORS = {
   [CardType.Artifact]: '#0d324d',
   [CardType.Unknown]: '#262d40',
 };
+
+const TYPE_ORDER = [CardType.Minion, CardType.Magic, CardType.Site, CardType.Aura, CardType.Artifact];
 
 const ELEMENT_COLORS = {
   [Element.Fire]: '#dd7230',
@@ -28,28 +39,12 @@ const ELEMENT_COLORS = {
 export default function TypeChart() {
   const [drilldownType, setDrilldownType] = useState(null);
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
-  const { typeBreakdown, typeElementBreakdown } = filteredStats;
-  const activeType = pageFilter.type;
+  const { pageFilter, toggleFilter, baseStats, filteredStats } = useDeckFilter();
   const isMobile = useIsMobile();
-
-  const handlePieClick = useCallback(
-    (event) => {
-      if (!chartRef.current) return;
-      const elems = getElementAtEvent(chartRef.current, event);
-      if (elems.length === 0) return;
-      const index = elems[0].index;
-      const label = Object.keys(typeBreakdown)[index];
-      if (label) {
-        toggleFilter('type', label);
-      }
-    },
-    [typeBreakdown, toggleFilter],
-  );
 
   // Drilldown view: Doughnut of element breakdown for the selected type
   if (drilldownType !== null) {
-    const breakdown = typeElementBreakdown[drilldownType] || {};
+    const breakdown = baseStats.typeElementBreakdown[drilldownType] || {};
     const activeElements = Object.entries(breakdown).filter(
       ([, count]) => count > 0,
     );
@@ -98,7 +93,7 @@ export default function TypeChart() {
       <div className="section-panel-sandy p-3 sm:p-5 h-60 md:h-72 relative">
         <button
           onClick={() => setDrilldownType(null)}
-          className="absolute top-2 right-2 z-10 px-2 py-1 bg-shadow-grey-700 hover:bg-shadow-grey-600 border border-shadow-grey-600 rounded text-xs text-shadow-grey-300 transition-colors"
+          className="absolute top-2 right-2 z-10 px-2 py-1 bg-shadow-grey-200 hover:bg-shadow-grey-300 border border-shadow-grey-300 rounded text-xs text-shadow-grey-600 transition-colors"
         >
           Back to Types
         </button>
@@ -107,39 +102,42 @@ export default function TypeChart() {
     );
   }
 
-  // Top-level: Pie of card types
-  const labels = Object.keys(typeBreakdown);
-  const dataValues = Object.values(typeBreakdown);
-  const colors = labels.map((type) => {
-    const base = TYPE_COLORS[type] || TYPE_COLORS[CardType.Unknown];
-    if (activeType === null) return base;
-    return type === activeType ? base : base + '33';
-  });
+  // Top-level: Stacked horizontal bar of card types
+  const labels = TYPE_ORDER.filter((t) => (baseStats.typeBreakdown[t] || 0) > 0);
+  const filteredValues = labels.map((t) => filteredStats.typeBreakdown[t] || 0);
+  const remainderValues = labels.map(
+    (t) => Math.max(0, (baseStats.typeBreakdown[t] || 0) - (filteredStats.typeBreakdown[t] || 0)),
+  );
+  const colors = labels.map((t) => TYPE_COLORS[t] || TYPE_COLORS[CardType.Unknown]);
 
   const data = {
     labels,
     datasets: [
       {
-        data: dataValues,
+        label: 'Cards',
+        data: filteredValues,
         backgroundColor: colors,
-        borderColor: CHART_THEME.borderColor,
-        borderWidth: 2,
+        borderColor: colors,
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'Remainder',
+        data: remainderValues,
+        backgroundColor: CHART_THEME.remainderColor,
+        borderColor: 'transparent',
+        borderWidth: 0,
+        borderRadius: 4,
       },
     ],
   };
 
   const options = {
+    indexAxis: 'y',
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: isMobile ? 'bottom' : 'right',
-        labels: {
-          color: CHART_THEME.titleColor,
-          padding: isMobile ? 8 : 12,
-          usePointStyle: true,
-        },
-      },
+      legend: { display: false },
       title: {
         display: true,
         text: 'Card Types',
@@ -149,27 +147,62 @@ export default function TypeChart() {
           weight: 'bold',
         },
       },
+      tooltip: {
+        filter: (item) => item.raw > 0,
+        callbacks: {
+          label: (ctx) => {
+            if (ctx.datasetIndex === 0) return `Matched: ${ctx.raw}`;
+            return `Other: ${ctx.raw}`;
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        stacked: true,
+        ticks: { color: CHART_THEME.tickColor },
+        grid: { color: CHART_THEME.gridColor },
+      },
+      y: {
+        stacked: true,
+        ticks: { color: CHART_THEME.tickColor },
+        grid: { display: false },
+      },
     },
   };
 
-  // Show "View Elements" button when a type is selected via page filter and has element data
-  const canDrilldown = activeType && typeElementBreakdown?.[activeType];
+  const handleClick = useCallback(
+    (event) => {
+      if (!chartRef.current) return;
+      const elems = getElementAtEvent(chartRef.current, event);
+      if (elems.length === 0) return;
+      const index = elems[0].index;
+      if (labels[index]) {
+        toggleFilter('type', labels[index]);
+      }
+    },
+    [toggleFilter, labels],
+  );
+
+  // Show "View Elements" button when exactly one type is selected and has element data
+  const canDrilldown = pageFilter.type.length === 1 && baseStats.typeElementBreakdown?.[pageFilter.type[0]];
 
   return (
     <div className="section-panel-sandy p-3 sm:p-5 h-60 md:h-72 relative [&_canvas]:!cursor-pointer">
       {canDrilldown && (
         <button
-          onClick={() => setDrilldownType(activeType)}
-          className="absolute top-2 right-2 z-10 px-2 py-1 bg-mint-cream-700 hover:bg-mint-cream-600 border border-mint-cream-500 rounded text-xs text-mint-cream-100 transition-colors"
+          onClick={() => setDrilldownType(pageFilter.type[0])}
+          className="absolute top-2 right-2 z-10 px-2 py-1 bg-mint-cream-500 hover:bg-mint-cream-600 border border-mint-cream-600 rounded text-xs text-white transition-colors"
         >
           View Elements &rarr;
         </button>
       )}
-      <Pie
+      <Bar
         ref={chartRef}
         options={options}
         data={data}
-        onClick={handlePieClick}
+        onClick={handleClick}
       />
     </div>
   );

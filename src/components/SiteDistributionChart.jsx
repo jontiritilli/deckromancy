@@ -72,15 +72,14 @@ const options = {
 
 export default function SiteDistributionChart() {
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
-  const { siteElementBreakdown, maxThresholds } = filteredStats;
-  const activeElement = pageFilter.element;
+  const { pageFilter, toggleFilter, baseStats } = useDeckFilter();
+  const { siteElementBreakdown, maxThresholds, thresholdPipSums } = baseStats;
 
   const elements = [Element.Fire, Element.Water, Element.Earth, Element.Air];
 
-  // Only show elements that have either sites or a threshold > 0
+  // Only show elements that have sites, a threshold > 0, or pip sums > 0
   const active = elements.filter(
-    (el) => siteElementBreakdown[el] > 0 || maxThresholds[el] > 0,
+    (el) => siteElementBreakdown[el] > 0 || maxThresholds[el] > 0 || (thresholdPipSums[el] || 0) > 0,
   );
 
   const labels = active.map((el) => ELEMENT_LABELS[el]);
@@ -100,12 +99,14 @@ export default function SiteDistributionChart() {
   if (active.length === 0) return null;
 
   const siteData = active.map((el) => siteElementBreakdown[el]);
+  const pipSumData = active.map((el) => thresholdPipSums[el] || 0);
   const thresholdData = active.map((el) => maxThresholds[el]);
+  const hasSelection = pageFilter.element.length > 0;
   const colors = active.map((el) => {
     const base = ELEMENT_COLORS[el];
     const label = ELEMENT_LABELS[el];
-    if (activeElement === null) return base;
-    return label === activeElement ? base : base + '33';
+    if (!hasSelection) return base;
+    return pageFilter.element.includes(label) ? base : base + '33';
   });
 
   const data = {
@@ -115,6 +116,16 @@ export default function SiteDistributionChart() {
         label: 'Sites',
         data: siteData,
         backgroundColor: colors,
+        borderColor: colors,
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'Total Pips',
+        data: pipSumData,
+        backgroundColor: colors.map((c) =>
+          c.length <= 7 ? c + '88' : c.slice(0, 7) + '88',
+        ),
         borderColor: colors,
         borderWidth: 1,
         borderRadius: 4,

@@ -3,33 +3,38 @@ import { computeStatsFromFormattedCards } from '../lib/deck-analyzer';
 
 const DeckFilterContext = createContext(null);
 
-const INITIAL_FILTER = { cost: null, type: null, rarity: null, element: null, keyword: null };
+const INITIAL_FILTER = { cost: [], type: [], rarity: [], element: [], keyword: [] };
 
 function applyPageFilter(cards, pageFilter) {
   let result = cards;
 
-  if (pageFilter.cost !== null) {
+  if (pageFilter.cost.length > 0) {
     result = result.filter((c) => {
       if (c.cost === null) return false;
-      if (pageFilter.cost === '7+') return c.cost >= 7;
-      return c.cost === Number(pageFilter.cost);
+      return pageFilter.cost.some((v) =>
+        v === '7+' ? c.cost >= 7 : c.cost === Number(v),
+      );
     });
   }
 
-  if (pageFilter.type) {
-    result = result.filter((c) => c.type === pageFilter.type);
+  if (pageFilter.type.length > 0) {
+    result = result.filter((c) => pageFilter.type.includes(c.type));
   }
 
-  if (pageFilter.rarity) {
-    result = result.filter((c) => c.rarity === pageFilter.rarity);
+  if (pageFilter.rarity.length > 0) {
+    result = result.filter((c) => pageFilter.rarity.includes(c.rarity));
   }
 
-  if (pageFilter.element) {
-    result = result.filter((c) => c.elements.includes(pageFilter.element));
+  if (pageFilter.element.length > 0) {
+    result = result.filter((c) =>
+      c.elements.some((el) => pageFilter.element.includes(el)),
+    );
   }
 
-  if (pageFilter.keyword) {
-    result = result.filter((c) => (c.keywords || []).includes(pageFilter.keyword));
+  if (pageFilter.keyword.length > 0) {
+    result = result.filter((c) =>
+      (c.keywords || []).some((kw) => pageFilter.keyword.includes(kw)),
+    );
   }
 
   return result;
@@ -54,6 +59,14 @@ export function DeckFilterProvider({ deck, children }) {
     return { ...stats, deckCardCount, collectionCardCount };
   }, [deck.cards, deck.sideboard]);
 
+  // Unfiltered stats for charts (respects includeCollection but NOT pageFilter)
+  const baseStats = useMemo(() => {
+    const statsCards = includeCollection
+      ? [...deck.cards, ...deck.sideboard]
+      : deck.cards;
+    return computeStatsFromFormattedCards(statsCards);
+  }, [deck.cards, deck.sideboard, includeCollection]);
+
   // Stats for everything below the header (respects includeCollection + page filters)
   const filteredStats = useMemo(() => {
     const filteredDeck = applyPageFilter(deck.cards, pageFilter);
@@ -74,7 +87,9 @@ export function DeckFilterProvider({ deck, children }) {
   const toggleFilter = useCallback((dimension, value) => {
     setPageFilter((prev) => ({
       ...prev,
-      [dimension]: prev[dimension] === value ? null : value,
+      [dimension]: prev[dimension].includes(value)
+        ? prev[dimension].filter((v) => v !== value)
+        : [...prev[dimension], value],
     }));
   }, []);
 
@@ -83,7 +98,7 @@ export function DeckFilterProvider({ deck, children }) {
   }, []);
 
   return (
-    <DeckFilterContext.Provider value={{ deck, pageFilter, toggleFilter, clearFilters, headerStats, filteredStats, includeCollection, setIncludeCollection }}>
+    <DeckFilterContext.Provider value={{ deck, pageFilter, toggleFilter, clearFilters, headerStats, baseStats, filteredStats, includeCollection, setIncludeCollection }}>
       {children}
     </DeckFilterContext.Provider>
   );

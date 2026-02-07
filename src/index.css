@@ -3,29 +3,34 @@
 @tailwind utilities;
 
 body {
-  @apply bg-shadow-grey-950 text-shadow-grey-100;
+  @apply bg-sandy-brown-50 text-shadow-grey-800;
 }
 
 @layer components {
   .section-panel {
-    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50;
+    @apply bg-white/80 backdrop-blur-sm rounded-xl border border-shadow-grey-200;
   }
   .section-panel-cyan {
-    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-pacific-cyan-500;
+    @apply bg-pacific-cyan-50/60 backdrop-blur-sm rounded-xl border border-pacific-cyan-200/60 border-l-4 border-l-pacific-cyan-500;
   }
   .section-panel-mint {
-    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-mint-cream-400;
+    @apply bg-mint-cream-50/60 backdrop-blur-sm rounded-xl border border-mint-cream-200/60 border-l-4 border-l-mint-cream-500;
   }
   .section-panel-sandy {
-    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-sandy-brown-400;
+    @apply bg-sandy-brown-50/60 backdrop-blur-sm rounded-xl border border-sandy-brown-200/60 border-l-4 border-l-sandy-brown-500;
   }
   .section-panel-rosy {
-    @apply bg-shadow-grey-800/80 backdrop-blur-sm rounded-xl border border-shadow-grey-700/50 border-l-4 border-l-rosy-granite-400;
+    @apply bg-rosy-granite-50/60 backdrop-blur-sm rounded-xl border border-rosy-granite-200/60 border-l-4 border-l-rosy-granite-400;
+  }
+  .section-panel-hero {
+    @apply bg-white/70 backdrop-blur-sm rounded-xl border border-sandy-brown-200/60;
+    background-image: radial-gradient(ellipse at 0% 50%, rgba(248, 182, 120, 0.15) 0%, transparent 55%);
   }
   .section-label {
     @apply text-xs font-bold uppercase tracking-widest mb-3;
   }
   .divider-gradient {
-    @apply h-px bg-gradient-to-r from-transparent via-rosy-granite-500/40 to-transparent my-4 md:my-8;
+    @apply h-px my-4 md:my-8;
+    background-image: linear-gradient(to right, transparent, rgba(221,114,48,0.35) 25%, rgba(173,133,147,0.4) 50%, rgba(121,183,145,0.35) 75%, transparent);
   }
 }

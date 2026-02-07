@@ -46,10 +46,20 @@ const options = {
         weight: 'bold',
       },
     },
+    tooltip: {
+      filter: (item) => item.raw > 0,
+      callbacks: {
+        label: (ctx) => {
+          if (ctx.datasetIndex === 0) return `Matched: ${ctx.raw}`;
+          return `Other: ${ctx.raw}`;
+        },
+      },
+    },
   },
   scales: {
     x: {
       beginAtZero: true,
+      stacked: true,
       ticks: {
         color: CHART_THEME.tickColor,
       },
@@ -58,6 +68,7 @@ const options = {
       },
     },
     y: {
+      stacked: true,
       ticks: {
         color: CHART_THEME.tickColor,
       },
@@ -70,28 +81,32 @@ const options = {
 
 export default function RarityChart() {
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
-  const { rarityBreakdown } = filteredStats;
-  const activeRarity = pageFilter.rarity;
+  const { pageFilter, toggleFilter, baseStats, filteredStats } = useDeckFilter();
 
-  // Sort rarities in a consistent order
-  const labels = RARITY_ORDER.filter((r) => rarityBreakdown[r] > 0);
-  const dataValues = labels.map((r) => rarityBreakdown[r]);
-  const colors = labels.map((r) => {
-    const base = RARITY_COLORS[r] || '#5e70a1';
-    if (activeRarity === null) return base;
-    return r === activeRarity ? base : base + '33';
-  });
+  const labels = RARITY_ORDER.filter((r) => (baseStats.rarityBreakdown[r] || 0) > 0);
+  const filteredValues = labels.map((r) => filteredStats.rarityBreakdown[r] || 0);
+  const remainderValues = labels.map(
+    (r) => Math.max(0, (baseStats.rarityBreakdown[r] || 0) - (filteredStats.rarityBreakdown[r] || 0)),
+  );
+  const colors = labels.map((r) => RARITY_COLORS[r] || '#5e70a1');
 
   const data = {
     labels,
     datasets: [
       {
         label: 'Cards',
-        data: dataValues,
+        data: filteredValues,
         backgroundColor: colors,
         borderColor: colors,
         borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'Remainder',
+        data: remainderValues,
+        backgroundColor: CHART_THEME.remainderColor,
+        borderColor: 'transparent',
+        borderWidth: 0,
         borderRadius: 4,
       },
     ],

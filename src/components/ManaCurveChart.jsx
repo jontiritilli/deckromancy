@@ -21,6 +21,8 @@ ChartJS.register(
   Legend
 );
 
+const BASE_COLOR = '#208aae';
+
 const options = {
   responsive: true,
   maintainAspectRatio: false,
@@ -37,10 +39,20 @@ const options = {
         weight: 'bold',
       },
     },
+    tooltip: {
+      filter: (item) => item.raw > 0,
+      callbacks: {
+        label: (ctx) => {
+          if (ctx.datasetIndex === 0) return `Matched: ${ctx.raw}`;
+          return `Other: ${ctx.raw}`;
+        },
+      },
+    },
   },
   scales: {
     y: {
       beginAtZero: true,
+      stacked: true,
       ticks: {
         color: CHART_THEME.tickColor,
         stepSize: 2,
@@ -50,6 +62,7 @@ const options = {
       },
     },
     x: {
+      stacked: true,
       ticks: {
         color: CHART_THEME.tickColor,
       },
@@ -60,20 +73,14 @@ const options = {
   },
 };
 
-const BASE_COLOR = '#208aae';
-const DIM_COLOR = '#208aae33';
-
 export default function ManaCurveChart() {
   const chartRef = useRef(null);
-  const { pageFilter, toggleFilter, filteredStats } = useDeckFilter();
-  const { manaCurve } = filteredStats;
-  const activeCost = pageFilter.cost;
-
+  const { pageFilter, toggleFilter, baseStats, filteredStats } = useDeckFilter();
   const labels = ['0', '1', '2', '3', '4', '5', '6', '7+'];
-  const dataValues = labels.map((label) => manaCurve[label] || 0);
 
-  const bgColors = labels.map((label) =>
-    activeCost === null ? BASE_COLOR : label === activeCost ? BASE_COLOR : DIM_COLOR
+  const filteredValues = labels.map((l) => filteredStats.manaCurve[l] || 0);
+  const remainderValues = labels.map(
+    (l) => Math.max(0, (baseStats.manaCurve[l] || 0) - (filteredStats.manaCurve[l] || 0)),
   );
 
   const data = {
@@ -81,10 +88,18 @@ export default function ManaCurveChart() {
     datasets: [
       {
         label: 'Cards',
-        data: dataValues,
-        backgroundColor: bgColors,
+        data: filteredValues,
+        backgroundColor: BASE_COLOR,
         borderColor: '#186e8b',
         borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'Remainder',
+        data: remainderValues,
+        backgroundColor: CHART_THEME.remainderColor,
+        borderColor: 'transparent',
+        borderWidth: 0,
         borderRadius: 4,
       },
     ],
