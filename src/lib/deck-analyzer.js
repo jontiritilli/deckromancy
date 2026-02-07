@@ -5,14 +5,30 @@ import { CardType, Element } from './enums';
 
 export const KEYWORD_CATEGORIES = {
   Abilities: [
-    'Airborne', 'Burrow', 'Submerge', 'Lethal', 'Ranged',
-    'Stealth', 'Charge', 'Guardian', 'Immobile', 'Projectile',
-    'Spellcaster', 'Disable',
+    'Airborne',
+    'Burrow',
+    'Submerge',
+    'Lethal',
+    'Ranged',
+    'Stealth',
+    'Charge',
+    'Guardian',
+    'Immobile',
+    'Projectile',
+    'Spellcaster',
+    'Disable',
   ],
   Triggers: ['Genesis', 'Arrival', 'Death'],
   Mechanics: [
-    'Ward', 'Banish', 'Silence', 'Token', 'Summon',
-    'Draw', 'Damage', 'Life Gain', 'Life Loss',
+    'Ward',
+    'Banish',
+    'Silence',
+    'Token',
+    'Summon',
+    'Draw',
+    'Damage',
+    'Life Gain',
+    'Life Loss',
   ],
   Positioning: ['Nearby', 'Adjacent', 'Front'],
 };
@@ -87,17 +103,63 @@ export function extractKeywords(rulesText) {
  */
 export function computeStats(cards) {
   const manaCurve = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, '7+': 0 };
-  const elementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
-  const maxThresholds = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
-  const thresholdPipSums = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
+  const elementBreakdown = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+    [Element.None]: 0,
+  };
+  const maxThresholds = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+  };
+  const thresholdPipSums = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+  };
   const typeBreakdown = {};
   const rarityBreakdown = {};
-  const siteElementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
+  const siteElementBreakdown = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+    [Element.None]: 0,
+  };
   const typeElementBreakdown = {
-    [CardType.Minion]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
-    [CardType.Magic]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
-    [CardType.Site]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
-    [CardType.Aura]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Minion]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
+    [CardType.Magic]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
+    [CardType.Site]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
+    [CardType.Aura]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
   };
 
   let totalCards = 0;
@@ -125,7 +187,10 @@ export function computeStats(cards) {
     } else {
       for (const el of elements) {
         const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
-        if (elName && Object.prototype.hasOwnProperty.call(elementBreakdown, elName)) {
+        if (
+          elName &&
+          Object.prototype.hasOwnProperty.call(elementBreakdown, elName)
+        ) {
           elementBreakdown[elName] += qty;
         }
       }
@@ -150,10 +215,14 @@ export function computeStats(cards) {
 
     // Threshold pip sums (Sites only — these represent sources, not requirements)
     if (type === CardType.Site) {
-      if (card.fireThreshold) thresholdPipSums[Element.Fire] += card.fireThreshold * qty;
-      if (card.waterThreshold) thresholdPipSums[Element.Water] += card.waterThreshold * qty;
-      if (card.earthThreshold) thresholdPipSums[Element.Earth] += card.earthThreshold * qty;
-      if (card.airThreshold) thresholdPipSums[Element.Air] += card.airThreshold * qty;
+      if (card.fireThreshold)
+        thresholdPipSums[Element.Fire] += card.fireThreshold * qty;
+      if (card.waterThreshold)
+        thresholdPipSums[Element.Water] += card.waterThreshold * qty;
+      if (card.earthThreshold)
+        thresholdPipSums[Element.Earth] += card.earthThreshold * qty;
+      if (card.airThreshold)
+        thresholdPipSums[Element.Air] += card.airThreshold * qty;
     }
     typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
 
@@ -164,7 +233,10 @@ export function computeStats(cards) {
       } else {
         for (const el of elements) {
           const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
-          if (elName && Object.prototype.hasOwnProperty.call(siteElementBreakdown, elName)) {
+          if (
+            elName &&
+            Object.prototype.hasOwnProperty.call(siteElementBreakdown, elName)
+          ) {
             siteElementBreakdown[elName] += qty;
           }
         }
@@ -178,7 +250,13 @@ export function computeStats(cards) {
       } else {
         for (const el of elements) {
           const elName = el.id?.toLowerCase() || el.name?.toLowerCase();
-          if (elName && Object.prototype.hasOwnProperty.call(typeElementBreakdown[type], elName)) {
+          if (
+            elName &&
+            Object.prototype.hasOwnProperty.call(
+              typeElementBreakdown[type],
+              elName,
+            )
+          ) {
             typeElementBreakdown[type][elName] += qty;
           }
         }
@@ -190,7 +268,8 @@ export function computeStats(cards) {
     rarityBreakdown[rarity] = (rarityBreakdown[rarity] || 0) + qty;
   }
 
-  const avgCost = cardsWithCost > 0 ? +(totalCost / cardsWithCost).toFixed(2) : 0;
+  const avgCost =
+    cardsWithCost > 0 ? +(totalCost / cardsWithCost).toFixed(2) : 0;
 
   return {
     totalCards,
@@ -248,9 +327,20 @@ export function formatCard(item) {
   const card = item.card;
   const keywords = extractKeywords(card.rulesText);
 
-  // Get image URL from first variant if available
-  const imageUrl = card.variants?.[0]?.src ?? null;
-  const isRotated = card.type === CardType.Site;
+  // Get image URL - use rotated version for Site cards
+  let imageUrl = card.variants?.[0]?.src ?? null;
+
+  // Replace URL with rotated version for Site cards
+  if (
+    card.type === CardType.Site &&
+    imageUrl &&
+    !imageUrl.includes('/rotated/')
+  ) {
+    imageUrl = imageUrl.replace(
+      /cloudfront\.net\/cards\//,
+      'cloudfront.net/rotated/',
+    );
+  }
 
   return {
     name: card.name,
@@ -264,7 +354,6 @@ export function formatCard(item) {
     quantity: item.quantity,
     keywords,
     imageUrl,
-    isRotated,
     fireThreshold: card.fireThreshold || 0,
     waterThreshold: card.waterThreshold || 0,
     earthThreshold: card.earthThreshold || 0,
@@ -300,17 +389,63 @@ export function formatAvatar(avatar) {
  */
 export function computeStatsFromFormattedCards(cards) {
   const manaCurve = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, '7+': 0 };
-  const elementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
-  const maxThresholds = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
-  const thresholdPipSums = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0 };
+  const elementBreakdown = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+    [Element.None]: 0,
+  };
+  const maxThresholds = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+  };
+  const thresholdPipSums = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+  };
   const typeBreakdown = {};
   const rarityBreakdown = {};
-  const siteElementBreakdown = { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 };
+  const siteElementBreakdown = {
+    [Element.Fire]: 0,
+    [Element.Water]: 0,
+    [Element.Earth]: 0,
+    [Element.Air]: 0,
+    [Element.None]: 0,
+  };
   const typeElementBreakdown = {
-    [CardType.Minion]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
-    [CardType.Magic]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
-    [CardType.Site]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
-    [CardType.Aura]: { [Element.Fire]: 0, [Element.Water]: 0, [Element.Earth]: 0, [Element.Air]: 0, [Element.None]: 0 },
+    [CardType.Minion]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
+    [CardType.Magic]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
+    [CardType.Site]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
+    [CardType.Aura]: {
+      [Element.Fire]: 0,
+      [Element.Water]: 0,
+      [Element.Earth]: 0,
+      [Element.Air]: 0,
+      [Element.None]: 0,
+    },
   };
 
   let totalCards = 0;
@@ -341,19 +476,27 @@ export function computeStatsFromFormattedCards(cards) {
       }
     }
 
-    if ((card.fireThreshold || 0) > maxThresholds[Element.Fire]) maxThresholds[Element.Fire] = card.fireThreshold;
-    if ((card.waterThreshold || 0) > maxThresholds[Element.Water]) maxThresholds[Element.Water] = card.waterThreshold;
-    if ((card.earthThreshold || 0) > maxThresholds[Element.Earth]) maxThresholds[Element.Earth] = card.earthThreshold;
-    if ((card.airThreshold || 0) > maxThresholds[Element.Air]) maxThresholds[Element.Air] = card.airThreshold;
+    if ((card.fireThreshold || 0) > maxThresholds[Element.Fire])
+      maxThresholds[Element.Fire] = card.fireThreshold;
+    if ((card.waterThreshold || 0) > maxThresholds[Element.Water])
+      maxThresholds[Element.Water] = card.waterThreshold;
+    if ((card.earthThreshold || 0) > maxThresholds[Element.Earth])
+      maxThresholds[Element.Earth] = card.earthThreshold;
+    if ((card.airThreshold || 0) > maxThresholds[Element.Air])
+      maxThresholds[Element.Air] = card.airThreshold;
 
     const type = card.type || CardType.Unknown;
 
     // Threshold pip sums (Sites only — these represent sources, not requirements)
     if (type === CardType.Site) {
-      if (card.fireThreshold) thresholdPipSums[Element.Fire] += card.fireThreshold * qty;
-      if (card.waterThreshold) thresholdPipSums[Element.Water] += card.waterThreshold * qty;
-      if (card.earthThreshold) thresholdPipSums[Element.Earth] += card.earthThreshold * qty;
-      if (card.airThreshold) thresholdPipSums[Element.Air] += card.airThreshold * qty;
+      if (card.fireThreshold)
+        thresholdPipSums[Element.Fire] += card.fireThreshold * qty;
+      if (card.waterThreshold)
+        thresholdPipSums[Element.Water] += card.waterThreshold * qty;
+      if (card.earthThreshold)
+        thresholdPipSums[Element.Earth] += card.earthThreshold * qty;
+      if (card.airThreshold)
+        thresholdPipSums[Element.Air] += card.airThreshold * qty;
     }
     typeBreakdown[type] = (typeBreakdown[type] || 0) + qty;
 
@@ -363,7 +506,9 @@ export function computeStatsFromFormattedCards(cards) {
       } else {
         for (const el of elements) {
           const elKey = el.toLowerCase();
-          if (Object.prototype.hasOwnProperty.call(siteElementBreakdown, elKey)) {
+          if (
+            Object.prototype.hasOwnProperty.call(siteElementBreakdown, elKey)
+          ) {
             siteElementBreakdown[elKey] += qty;
           }
         }
@@ -376,7 +521,12 @@ export function computeStatsFromFormattedCards(cards) {
       } else {
         for (const el of elements) {
           const elKey = el.toLowerCase();
-          if (Object.prototype.hasOwnProperty.call(typeElementBreakdown[type], elKey)) {
+          if (
+            Object.prototype.hasOwnProperty.call(
+              typeElementBreakdown[type],
+              elKey,
+            )
+          ) {
             typeElementBreakdown[type][elKey] += qty;
           }
         }
@@ -387,7 +537,8 @@ export function computeStatsFromFormattedCards(cards) {
     rarityBreakdown[rarity] = (rarityBreakdown[rarity] || 0) + qty;
   }
 
-  const avgCost = cardsWithCost > 0 ? +(totalCost / cardsWithCost).toFixed(2) : 0;
+  const avgCost =
+    cardsWithCost > 0 ? +(totalCost / cardsWithCost).toFixed(2) : 0;
 
   // Keyword breakdown
   const keywordBreakdown = {};
@@ -424,7 +575,15 @@ export function computeStatsFromFormattedCards(cards) {
  * @param {string|null} deckName - User-given deck name
  * @returns {Object} Complete analyzed deck output
  */
-export function analyzeDeck(decklist, avatar, sideboard, maybeboard, deckId, sourceUrl, deckName) {
+export function analyzeDeck(
+  decklist,
+  avatar,
+  sideboard,
+  maybeboard,
+  deckId,
+  sourceUrl,
+  deckName,
+) {
   const stats = computeStats(decklist);
   const synergies = aggregateSynergies(decklist);
   const cards = decklist.map(formatCard);

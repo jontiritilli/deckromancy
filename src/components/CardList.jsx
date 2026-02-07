@@ -38,7 +38,6 @@ export default function CardList({ cards, title = 'Cards' }) {
   const [hover, setHover] = useState({
     visible: false,
     imageUrl: null,
-    isRotated: false,
     rect: null,
   });
 
@@ -140,13 +139,12 @@ export default function CardList({ cards, title = 'Cards' }) {
     setHover({
       visible: true,
       imageUrl: card.imageUrl,
-      isRotated: card.isRotated,
       rect,
     });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    setHover({ visible: false, imageUrl: null, isRotated: false, rect: null });
+    setHover({ visible: false, imageUrl: null, rect: null });
   }, []);
 
   const SortIcon = ({ column }) => {
@@ -156,12 +154,13 @@ export default function CardList({ cards, title = 'Cards' }) {
     );
   };
 
-  // Compute preview position anchored to thumbnail
+  // Compute preview position anchored to thumbnail (portrait 5:7 vs landscape 7:5 for rotated)
+  const isRotatedHover = hover.imageUrl?.includes('rotated') === true;
   const previewStyle =
     hover.visible && hover.rect
       ? (() => {
-          const imgW = 350;
-          const imgH = 500;
+          const imgW = isRotatedHover ? 500 : 350;
+          const imgH = isRotatedHover ? 350 : 500;
           const rect = hover.rect;
           // Horizontal: try right, flip to left if needed
           let x = rect.right + 8;
@@ -295,16 +294,19 @@ export default function CardList({ cards, title = 'Cards' }) {
               {filteredCards.map((card, idx) => (
                 <div
                   key={`${card.name}-${idx}`}
-                  className="bg-white/60 rounded-lg overflow-hidden border border-shadow-grey-200 active:border-pacific-cyan-400 transition-colors"
+                  className={`${
+                    card.imageUrl.includes('rotated')
+                      ? 'flex flex-col justify-between items-between'
+                      : ''
+                  } bg-white/60 overflow-hidden border border-shadow-grey-200 active:border-pacific-cyan-400 transition-colors`}
+                  style={{ borderRadius: '14px' }}
                   onClick={() => setPreviewCard(card)}
                 >
                   {card.imageUrl ? (
                     <div
-                      className={
-                        card.isRotated
-                          ? 'aspect-[7/5] overflow-hidden'
-                          : 'aspect-[5/7] overflow-hidden'
-                      }
+                      className={`aspect-[${
+                        card.imageUrl.includes('rotated') ? '7/5' : '5/7'
+                      }] overflow-hidden`}
                     >
                       <img
                         src={card.imageUrl}
@@ -318,7 +320,7 @@ export default function CardList({ cards, title = 'Cards' }) {
                       No Image
                     </div>
                   )}
-                  <div className="p-2">
+                  <div className="p-2 min-h-[52px] flex flex-col justify-between">
                     <div className="text-xs font-medium text-shadow-grey-700 truncate">
                       {card.name}
                     </div>
@@ -389,16 +391,20 @@ export default function CardList({ cards, title = 'Cards' }) {
                       <td className="py-2 pr-4 flex items-center justify-center">
                         {card.imageUrl ? (
                           <div
-                            className={`overflow-hidden rounded ${
-                              card.isRotated
-                                ? 'w-12 h-16 rotate-90'
+                            className={` overflow-hidden rounded flex flex-col justify-center ${
+                              card.imageUrl.includes('rotated')
+                                ? 'w-16 h-12'
                                 : 'w-12 h-16'
                             }`}
                           >
                             <img
                               src={card.imageUrl}
                               alt={card.name}
-                              className="w-full h-full object-cover cursor-zoom-in"
+                              className={`object-cover cursor-zoom-in ${
+                                card.imageUrl.includes('rotated')
+                                  ? 'w-full'
+                                  : 'h-full'
+                              }`}
                               loading="lazy"
                               onMouseEnter={
                                 isMobile
@@ -483,9 +489,7 @@ export default function CardList({ cards, title = 'Cards' }) {
             <img
               src={hover.imageUrl}
               alt="Card preview"
-              className={`w-full h-full object-cover rounded-lg shadow-2xl border border-sandy-brown-300/40 shadow-sandy-brown-200/30 ${
-                hover.isRotated ? 'rotate-90' : ''
-              }`}
+              className="w-full h-full object-cover rounded-lg shadow-2xl border border-sandy-brown-300/40 shadow-sandy-brown-200/30"
             />
           </div>,
           document.body,
@@ -499,7 +503,7 @@ export default function CardList({ cards, title = 'Cards' }) {
             onClick={() => setPreviewCard(null)}
           >
             <div
-              className="relative bg-white border border-shadow-grey-200 rounded-xl shadow-2xl max-h-[90vh] max-w-2xl w-full overflow-y-auto"
+              className="relative bg-white border border-shadow-grey-200 rounded-xl shadow-2xl max-h-[90vh] w-full max-w-md sm:max-w-2xl overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -510,15 +514,13 @@ export default function CardList({ cards, title = 'Cards' }) {
               </button>
 
               <div className="p-4">
-                <div className="flex gap-4 mb-3">
+                <div className="flex flex-col sm:flex-row gap-4 mb-3">
                   {previewCard.imageUrl && (
-                    <div className="shrink-0 w-80 h-80 flex items-center justify-center overflow-hidden rounded-lg">
+                    <div className="shrink-0 w-full sm:w-80 h-64 sm:h-80 flex items-center justify-center overflow-hidden rounded-lg">
                       <img
                         src={previewCard.imageUrl}
                         alt={previewCard.name}
-                        className={`max-h-full max-w-full rounded-lg ${
-                          previewCard.isRotated ? 'rotate-90' : ''
-                        }`}
+                        className="max-h-full max-w-full rounded-lg"
                       />
                     </div>
                   )}
