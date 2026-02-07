@@ -10,7 +10,7 @@ const ELEMENT_EMOJIS = {
 
 export default function DeckHeader() {
   const { deck, headerStats } = useDeckFilter();
-  const { deckName, avatar } = deck;
+  const { deckName, avatar, sourceUrl } = deck;
   const { totalCards, deckCardCount, collectionCardCount, avgCost, elementBreakdown } = headerStats;
 
   // Determine primary elements (non-zero counts)
@@ -39,9 +39,24 @@ export default function DeckHeader() {
 
       {/* Deck Info */}
       <div className="flex-1">
-        <h2 className="text-xl sm:text-2xl font-bold text-shadow-grey-50 mb-2 text-center sm:text-left">
-          {deckName || avatar?.name || 'Untitled Deck'}
-        </h2>
+        <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-shadow-grey-50">
+            {deckName || avatar?.name || 'Untitled Deck'}
+          </h2>
+          {sourceUrl && (
+            <a
+              href={sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="View on Curiosa"
+              className="text-shadow-grey-400 hover:text-sandy-brown-400 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                <path fillRule="evenodd" d="M4.25 5.5a.75.75 0 0 0-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-4a.75.75 0 0 1 1.5 0v4A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4h5a.75.75 0 0 1 0 1.5h-5Zm7.25-.75a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0V6.31l-5.47 5.47a.75.75 0 1 1-1.06-1.06l5.47-5.47H12.25a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+              </svg>
+            </a>
+          )}
+        </div>
 
         {/* Avatar Stats */}
         {avatar && (
