@@ -12,6 +12,7 @@ import TypeChart from './components/TypeChart';
 import RarityChart from './components/RarityChart';
 import SiteDistributionChart from './components/SiteDistributionChart';
 import SynergyTags from './components/SynergyTags';
+import ThresholdReliabilityPanel from './components/ThresholdReliabilityPanel';
 import CardList from './components/CardList';
 
 const FILTER_LABELS = {
@@ -218,6 +219,9 @@ function DeckContent({
         </div>
         <SiteDistributionChart />
       </div>
+
+      {/* Threshold Reliability */}
+      <ThresholdReliabilityPanel />
 
       <div className="divider-gradient" />
 
